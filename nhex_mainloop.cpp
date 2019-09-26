@@ -20,10 +20,12 @@ int main (){
   player = new Audio::Player();
   player->init();
 
-  Corpo *c1 = new Corpo(10, 0, 20);
+  Corpo *c1 = new Corpo(10, 10, 10, 10);
+  Corpo *c2 = new Corpo(10, 10, 25, 20);
 
   ListaDeCorpos *l = new ListaDeCorpos();
   l->add_corpo(c1);
+  l->add_corpo(c2);
 
 
   Fisica *f = new Fisica(l, 15, 3);
@@ -64,12 +66,12 @@ int main (){
     if (c=='w') {
        // Reproduz som
       asample->set_position(0);
-      f->choque(-15);
+    //  f->choque(-15);
     }
     else if(c == 's'){
        // Reproduz som
       asample->set_position(0);
-      f->choque(15);
+     // f->choque(15);
     }
     else if (c=='q') {
       break;

@@ -8,27 +8,42 @@
 #include <ncurses.h>
 using namespace std::chrono;
 
-Corpo::Corpo(float massa, float velocidade, float posicao) {
-  this->massa = massa;
-  this->velocidade = velocidade;
-  this->posicao = posicao;
+Corpo::Corpo(float vX, float vY, float posX, float posY) {
+  this->velX = vX;
+  this->velY = vY;
+  this->posX = posX;
+  this->posY = posY;
 }
 
-void Corpo::update(float nova_velocidade, float nova_posicao) {
-  this->velocidade = nova_velocidade;
-  this->posicao = nova_posicao;
+void Corpo::update(float new_velX, float new_velY, float new_posX, float new_posY) {
+  this->velX = new_velX;
+  this->velY = new_velY;
+  this->posX = new_posX;
+  this->posY = new_posY; 
 }
 
-float Corpo::get_massa() {
-  return this->massa;
+float Corpo::get_velY() {
+  return this->velY;
 }
 
-float Corpo::get_velocidade() {
-  return this->velocidade;
+float Corpo::get_velX() {
+  return this->velX;
 }
 
-float Corpo::get_posicao() {
-  return this->posicao;
+float Corpo::get_posY() {
+  return this->posY;
+}
+
+float Corpo::get_posX() {
+  return this->posX;
+}
+
+void  set_orb(char orb){
+  this->orb = orb;
+}
+
+char  get_orb(){
+  return this->orb;
 }
 
 ListaDeCorpos::ListaDeCorpos() {
@@ -39,10 +54,7 @@ void ListaDeCorpos::hard_copy(ListaDeCorpos *ldc) {
   std::vector<Corpo *> *corpos = ldc->get_corpos();
 
   for (int k=0; k<corpos->size(); k++) {
-    Corpo *c = new Corpo( (*corpos)[k]->get_massa(),\
-                          (*corpos)[k]->get_posicao(),\
-                          (*corpos)[k]->get_velocidade()
-                        );
+    Corpo *c = new Corpo((*corpos)[k]->get_velX(), (*corpos)[k]->get_velY(), (*corpos)[k]->get_posX(), (*corpos)[k]->get_posY());
     this->add_corpo(c);
   }
 
@@ -67,25 +79,34 @@ void Fisica::update(float deltaT, int tamTela) {
   // Atualiza parametros dos corpos!
   std::vector<Corpo *> *c = this->lista->get_corpos();
   for (int i = 0; i < (*c).size(); i++) {
-    float new_vel = (*c)[i]->get_velocidade() + (float)deltaT *
-                    (-((*c)[i]->get_posicao()- tamTela/2)*this->k -this->b*(*c)[i]->get_velocidade())/(1000*(*c)[i]->get_massa());
-    float new_pos = (*c)[i]->get_posicao() + (float)deltaT * new_vel/1000;
+    float new_velX, new_velY, new_posX, new_posY;
+ 
+    if(((*c)[i])->get_posX() <= MIN_X || ((*c)[i])->get_posX() >= MAX_X){
+      new_velX =  (-1)*((*c)[i])->get_velX(); 
+    }
+    else{
+      new_velX = ((*c)[i])->get_velX();
+    }
+    if(((*c)[i])->get_posY() <= MIN_Y || ((*c)[i])->get_posY() >= MAX_Y){
+      new_velY =  (-1)*((*c)[i])->get_velY(); 
+    }
+    else{
+      new_velY = ((*c)[i])->get_velY(); 
+    }
 
+    new_posX = (*c)[i]->get_posX() + (int)deltaT * new_velX/1000;
+    new_posY = (*c)[i]->get_posY() + (int)deltaT * new_velY/1000;
 
-    (*c)[i]->update(new_vel, new_pos);
+    (*c)[i]->update(new_velX, new_velY, new_posX,  new_posY);
   }
 }
 
 
 void Fisica::choque(int impulso) {
   // Atualiza parametros dos corpos!
-  std::vector<Corpo *> *c = this->lista->get_corpos();
-  for (int i = 0; i < (*c).size(); i++) {
-    float new_vel = (*c)[i]->get_velocidade() + impulso;
-    float new_pos = (*c)[i]->get_posicao();
-    (*c)[i]->update(new_vel, new_pos);
-  }
 }
+
+
 Tela::Tela(ListaDeCorpos *ldc, int maxI, int maxJ, float maxX, float maxY) {
   this->lista = ldc;
   this->lista_anterior = new ListaDeCorpos();
@@ -100,6 +121,10 @@ void Tela::init() {
   initscr();			       /* Start curses mode 		*/
 	raw();				         /* Line buffering disabled	*/
   curs_set(0);           /* Do not display cursor */
+
+
+  this->row = 50;
+  this->col = 200;
 }
 
 int Tela::getRows(){
@@ -111,37 +136,39 @@ int Tela::getCols(){
 }
 
 void Tela::update() {
-  int i;
+  int x_pos, y_pos;
   getmaxyx(stdscr, this->row, this->col);
+
+  if(this->row < MAX_X || this->col < MAX_Y){
+    move(row/2, col/2);
+    printw("Aumente a tela e reinicie o jogo");
+  }
 
   std::vector<Corpo *> *corpos_old = this->lista_anterior->get_corpos();
 
-  // Apaga corpos na tela
-  for (int k=0; k<corpos_old->size(); k++)
-  {
-    i = (int) ((*corpos_old)[k]->get_posicao()) * \
-        (this->maxI / this->maxX);
-//    if (i>=0 && k>=0 && i<=row && k<=col ) {
-      move(i, k);   /* Move cursor to position */
-      echochar(' ');  /* Prints character, advances a position */
-  //  }
+  //Apaga corpos na tela
+  for (int k=0; k<corpos_old->size(); k++){
+
+    x_pos = (int) ((*corpos_old)[k]->get_posX());
+    y_pos = (int) ((*corpos_old)[k]->get_posY());
+
+    move(x_pos, y_pos);   /* Move cursor to position */
+   // echochar(' ');  /* Prints character, advances a position */
   }
 
   // Desenha corpos na tela
   std::vector<Corpo *> *corpos = this->lista->get_corpos();
 
-  for (int k=0; k<corpos->size(); k++)
-  {
-    i = (int) ((*corpos)[k]->get_posicao()) * \
-        (this->maxI / this->maxX);
-    if (i>=0 && k>=0 && i<this->row && k<this->col) {
-      move(i, k);   /* Move cursor to position */
-      echochar('*');  /* Prints character, advances a position */
-    }
+  for (int k=0; k<corpos->size(); k++) {
+
+    x_pos = (int) ((*corpos)[k]->get_posX());
+    y_pos = (int) ((*corpos)[k]->get_posY());
+
+    move(x_pos, y_pos);   /* Move cursor to position */
+    echochar('*');  /* Prints character, advances a position */
 
     // Atualiza corpos antigos
-    (*corpos_old)[k]->update(  (*corpos)[k]->get_velocidade(),\
-                               (*corpos)[k]->get_posicao());
+    (*corpos_old)[k]->update((*corpos)[k]->get_velX(), (*corpos)[k]->get_velY(), (*corpos)[k]->get_posX(), (*corpos)[k]->get_posY());
   }
 
   // Atualiza tela

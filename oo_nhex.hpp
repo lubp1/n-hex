@@ -3,19 +3,25 @@
 #define OO_NHEX_HPP
 
 #include <thread>
+#define  MAX_Y 200
+#define  MIN_Y 2
+#define  MAX_X 50
+#define  MIN_X 2
 
 class Corpo {
   private:
-  float massa;
-  float velocidade;
-  float posicao;
+  float velY;
+  float velX;
+  float posY;
+  float posX;
 
   public:
-  Corpo(float massa, float velocidade, float posicao);
-  void update(float nova_velocidade, float nova_posicao);
-  float get_massa();
-  float get_velocidade();
-  float get_posicao();
+  Corpo(float vX, float vY, float posX, float posY);
+  void update(float new_velX, float new_velY, float new_posX, float new_posY);
+  float get_velY();
+  float get_velX();
+  float get_posY();
+  float get_posX();
 };
 
 class ListaDeCorpos {
