@@ -111,8 +111,6 @@ void Fisica::impulso() {
 
   int hex_number = this->mapa->buscaHex(posX, posY);
 
-  printw("X= %d", posX);
-  printw("\nY= %d", posY);
 
 }
 
@@ -206,7 +204,6 @@ int Mapa::buscaHex(int posX, int posY){
         hex_number = i;
       }
   }
-    printw("\ndist= %d", min_dist);
   return hex_number;
 }
 
@@ -245,6 +242,21 @@ void Tela::init() {
 
   this->row = 50;
   this->col = 200;
+
+  int i;
+  for (i=0;i<201;i++) {
+    move(0,i);
+    echochar('-');
+    move(50,  i);
+    echochar('-');
+  }
+  for (i=0;i<51;i++) {
+    move(i,0);
+    echochar('|');
+    move(i,201);
+    echochar('|');
+  }
+
 }
 
 int Tela::getRows(){
@@ -276,7 +288,7 @@ void Tela::update() {
     y_pos = (int) ((*corpos_old)[k]->get_posY());
 
     move(x_pos, y_pos);   /* Move cursor to position */
-   // echochar(' ');  /* Prints character, advances a position */
+    echochar(' ');  /* Prints character, advances a position */
   }
 
   // Desenha corpos na tela
