@@ -14,6 +14,7 @@ class Corpo {
   float velX;
   float posY;
   float posX;
+  char orb;
 
   public:
   Corpo(float vX, float vY, float posX, float posY);
@@ -22,6 +23,8 @@ class Corpo {
   float get_velX();
   float get_posY();
   float get_posX();
+  void set_orb(char orb);
+  char get_orb();
 };
 
 class ListaDeCorpos {

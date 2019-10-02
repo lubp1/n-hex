@@ -19,7 +19,7 @@ void Corpo::update(float new_velX, float new_velY, float new_posX, float new_pos
   this->velX = new_velX;
   this->velY = new_velY;
   this->posX = new_posX;
-  this->posY = new_posY; 
+  this->posY = new_posY;
 }
 
 float Corpo::get_velY() {
@@ -38,11 +38,11 @@ float Corpo::get_posX() {
   return this->posX;
 }
 
-void  set_orb(char orb){
+void Corpo::set_orb(char orb){
   this->orb = orb;
 }
 
-char  get_orb(){
+char Corpo::get_orb(){
   return this->orb;
 }
 
@@ -80,18 +80,18 @@ void Fisica::update(float deltaT, int tamTela) {
   std::vector<Corpo *> *c = this->lista->get_corpos();
   for (int i = 0; i < (*c).size(); i++) {
     float new_velX, new_velY, new_posX, new_posY;
- 
+
     if(((*c)[i])->get_posX() <= MIN_X || ((*c)[i])->get_posX() >= MAX_X){
-      new_velX =  (-1)*((*c)[i])->get_velX(); 
+      new_velX =  (-1)*((*c)[i])->get_velX();
     }
     else{
       new_velX = ((*c)[i])->get_velX();
     }
     if(((*c)[i])->get_posY() <= MIN_Y || ((*c)[i])->get_posY() >= MAX_Y){
-      new_velY =  (-1)*((*c)[i])->get_velY(); 
+      new_velY =  (-1)*((*c)[i])->get_velY();
     }
     else{
-      new_velY = ((*c)[i])->get_velY(); 
+      new_velY = ((*c)[i])->get_velY();
     }
 
     new_posX = (*c)[i]->get_posX() + (int)deltaT * new_velX/1000;
