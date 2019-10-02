@@ -9,6 +9,39 @@
 #define  MIN_X 2
 
 
+class Corpo {
+  private:
+  float velY;
+  float velX;
+  float posY;
+  float posX;
+  char orb;
+  char rot;
+
+  public:
+  Corpo(float vX, float vY, float posX, float posY);
+  void update(float new_velX, float new_velY, float new_posX, float new_posY);
+  float get_velY();
+  float get_velX();
+  float get_posY();
+  float get_posX();
+  void set_orb(char orb);
+  char get_orb();
+  void set_rot(char rot);
+  char get_rot();
+};
+
+class ListaDeCorpos {
+ private:
+    std::vector<Corpo*> *corpos;
+
+  public:
+    ListaDeCorpos();
+    void hard_copy(ListaDeCorpos *ldc);
+    void add_corpo(Corpo *c);
+    std::vector<Corpo*> *get_corpos();
+};
+
 class Mapa {
   private:
   int* listaX_Hex;
@@ -22,38 +55,8 @@ class Mapa {
   public:
   Mapa();
   int buscaHex(int posX, int posY);
-  int orbita(int number_hex);
+  char orbita(int x, int y, int hex);
   ~Mapa();
-};
-
-class Corpo {
-  private:
-  float velY;
-  float velX;
-  float posY;
-  float posX;
-  char orb;
-
-  public:
-  Corpo(float vX, float vY, float posX, float posY);
-  void update(float new_velX, float new_velY, float new_posX, float new_posY);
-  float get_velY();
-  float get_velX();
-  float get_posY();
-  float get_posX();
-  void set_orb(char orb);
-  char get_orb();
-};
-
-class ListaDeCorpos {
- private:
-    std::vector<Corpo*> *corpos;
-
-  public:
-    ListaDeCorpos();
-    void hard_copy(ListaDeCorpos *ldc);
-    void add_corpo(Corpo *c);
-    std::vector<Corpo*> *get_corpos();
 };
 
 class Fisica {

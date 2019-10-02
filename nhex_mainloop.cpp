@@ -61,15 +61,10 @@ int main (){
     // Lê o teclado
     char c = teclado->getchar();
 
-    if (c=='w') {
+    if (c==' ') {
        // Reproduz som
       asample->set_position(0);
       f->impulso();
-    }
-    else if(c == 's'){
-       // Reproduz som
-      asample->set_position(0);
-     // f->choque(15);
     }
     else if (c=='q') {
       break;

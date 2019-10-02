@@ -14,6 +14,8 @@ Corpo::Corpo(float vX, float vY, float posX, float posY) {
   this->velY = vY;
   this->posX = posX;
   this->posY = posY;
+  this->orb = '0';
+  this->rot = '0';
 }
 
 void Corpo::update(float new_velX, float new_velY, float new_posX, float new_posY) {
@@ -47,6 +49,14 @@ char Corpo::get_orb(){
   return this->orb;
 }
 
+void Corpo::set_rot(char rot){
+  this->rot = rot;
+}
+
+char Corpo::get_rot(){
+  return this->rot;
+}
+
 ListaDeCorpos::ListaDeCorpos() {
   this->corpos = new std::vector<Corpo *>(0);
 }
@@ -69,51 +79,6 @@ void ListaDeCorpos::add_corpo(Corpo *c) {
 std::vector<Corpo*> *ListaDeCorpos::get_corpos() {
   return (this->corpos);
 }
-
-Fisica::Fisica(ListaDeCorpos *ldc, Mapa* mapa) {
-  this->lista = ldc;
-  this->mapa = mapa;
-}
-
-void Fisica::update(float deltaT, int tamTela) {
-  // Atualiza parametros dos corpos!
-  std::vector<Corpo *> *c = this->lista->get_corpos();
-  for (int i = 0; i < (*c).size(); i++) {
-    float new_velX, new_velY, new_posX, new_posY;
-
-    if(((*c)[i])->get_posX() <= MIN_X || ((*c)[i])->get_posX() >= MAX_X){
-      new_velX =  (-1)*((*c)[i])->get_velX();
-    }
-    else{
-      new_velX = ((*c)[i])->get_velX();
-    }
-    if(((*c)[i])->get_posY() <= MIN_Y || ((*c)[i])->get_posY() >= MAX_Y){
-      new_velY =  (-1)*((*c)[i])->get_velY();
-    }
-    else{
-      new_velY = ((*c)[i])->get_velY();
-    }
-
-    new_posX = (*c)[i]->get_posX() + (int)deltaT * new_velX/1000;
-    new_posY = (*c)[i]->get_posY() + (int)deltaT * new_velY/1000;
-
-    (*c)[i]->update(new_velX, new_velY, new_posX,  new_posY);
-  }
-}
-
-
-void Fisica::impulso() {
-
-  std::vector<Corpo *> *c = this->lista->get_corpos();
-
-  int posX = (int)((*c)[0])->get_posX();
-  int posY = (int)((*c)[0])->get_posY();
-
-  int hex_number = this->mapa->buscaHex(posX, posY);
-
-
-}
-
 
 Mapa::Mapa() {
   this->listaX_Hex = (int*)malloc(8*sizeof(int));
@@ -197,7 +162,7 @@ int Mapa::buscaHex(int posX, int posY){
   int hex_number;
 
   for(int i=0; i< sizeof(this->listaX_Hex)/(sizeof(int)); i++){
-      new_dist = abs(listaX_Hex[i] - posX) + abs(listaY_Hex[i] - posY);
+      new_dist = (listaX_Hex[i] - posX)*(listaX_Hex[i] - posX) + (listaY_Hex[i] - posY)*(listaY_Hex[i] - posY);
 
       if(new_dist < min_dist){
         min_dist = new_dist;
@@ -205,6 +170,30 @@ int Mapa::buscaHex(int posX, int posY){
       }
   }
   return hex_number;
+}
+
+char Mapa::orbita(int x, int y, int hex) {
+  int i;
+
+  x = x - this->listaX_Hex[hex];
+  y = y - this->listaY_Hex[hex];
+
+  for (i=0;i<18;i++) {
+    if (i < 2 && x == this->orb1X[i] && y == this->orb1Y[i]) {
+      return '1';
+    }
+    if (i < 8 && x == this->orb2X[i] && y == this->orb2Y[i]) {
+      return '2';
+    }
+    if (i < 12 && x == this->orb3X[i] && y == this->orb3Y[i]) {
+      return '3';
+    }
+    if (i < 18 && x == this->orb4X[i] && y == this->orb4Y[i]) {
+      return '4';
+    }
+  }
+
+  return '0';
 }
 
 
@@ -221,6 +210,56 @@ Mapa::~Mapa() {
   free(this->orb4X);
   free(this->orb4Y);
 }
+
+
+
+
+
+Fisica::Fisica(ListaDeCorpos *ldc, Mapa* mapa) {
+  this->lista = ldc;
+  this->mapa = mapa;
+}
+
+void Fisica::update(float deltaT, int tamTela) {
+  // Atualiza parametros dos corpos!
+  std::vector<Corpo *> *c = this->lista->get_corpos();
+  for (int i = 0; i < (*c).size(); i++) {
+    float new_velX, new_velY, new_posX, new_posY;
+
+    if(((*c)[i])->get_posX() <= MIN_X || ((*c)[i])->get_posX() >= MAX_X){
+      new_velX =  (-1)*((*c)[i])->get_velX();
+    }
+    else{
+      new_velX = ((*c)[i])->get_velX();
+    }
+    if(((*c)[i])->get_posY() <= MIN_Y || ((*c)[i])->get_posY() >= MAX_Y){
+      new_velY =  (-1)*((*c)[i])->get_velY();
+    }
+    else{
+      new_velY = ((*c)[i])->get_velY();
+    }
+
+    new_posX = (*c)[i]->get_posX() + (int)deltaT * new_velX/1000;
+    new_posY = (*c)[i]->get_posY() + (int)deltaT * new_velY/1000;
+
+    (*c)[i]->update(new_velX, new_velY, new_posX,  new_posY);
+  }
+}
+
+
+void Fisica::impulso() {
+
+  std::vector<Corpo *> *c = this->lista->get_corpos();
+
+  int posX = (int)((*c)[0])->get_posX();
+  int posY = (int)((*c)[0])->get_posY();
+
+  int hex_number = this->mapa->buscaHex(posX, posY);
+  char orbita = this->mapa->orbita(posX, posY, hex_number);
+
+  (*c)[0]->set_orb(orbita);
+}
+
 
 
 Tela::Tela(ListaDeCorpos *ldc, int maxI, int maxJ, float maxX, float maxY, Mapa* mapa) {
