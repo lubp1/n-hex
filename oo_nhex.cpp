@@ -4,8 +4,9 @@
 #include <iostream>
 #include "01-playback.hpp"
 #include "oo_nhex.hpp"
-
+#include <cstdlib>
 #include <ncurses.h>
+
 using namespace std::chrono;
 
 Corpo::Corpo(float vX, float vY, float posX, float posY) {
@@ -102,8 +103,35 @@ void Fisica::update(float deltaT, int tamTela) {
 }
 
 
-void Fisica::choque(int impulso) {
-  // Atualiza parametros dos corpos!
+void Fisica::impulso() {
+  
+  std::vector<Corpo *> *c = this->lista->get_corpos();
+
+  int posX = (int)((*c)[0])->get_posX();
+  int posY = (int)((*c)[0])->get_posY();
+  
+  int hex_number = buscaHex(posX, posY);
+
+  printw("X= %d", posX);
+  printw("\nY= %d", posY);
+
+}
+
+int Mapa::buscaHex(int posX, int posY){
+  int new_dist=0;
+  int min_dist=200;
+  int hex_number;
+
+  for(int i=0; i< sizeof(this->listaX_Hex)/(sizeof(int)); i++){
+      new_dist = abs(listaX_Hex[i] - posX) + abs(listaY_Hex[i] - posY); 
+
+      if(new_dist < min_dist){
+        min_dist = new_dist;
+        hex_number = i;
+      }
+  }
+    printw("\ndist= %d", min_dist);
+  return hex_number;
 }
 
 
@@ -136,6 +164,9 @@ int Tela::getCols(){
 }
 
 void Tela::update() {
+  move(13, 34);                                                     //TESTE
+  printw("o");
+
   int x_pos, y_pos;
   getmaxyx(stdscr, this->row, this->col);
 

@@ -5,8 +5,26 @@
 #include <thread>
 #define  MAX_Y 200
 #define  MIN_Y 2
-#define  MAX_X 50
+#define  MAX_X 49
 #define  MIN_X 2
+
+
+class Mapa(){
+  private:
+  int* listaX_Hex;
+  int* listaY_Hex;
+
+  int *orb1X, *orb1Y;
+  int *orb2X, *orb2Y;
+  int *orb3X, *orb3Y;
+  int *orb4X, *orb4Y;
+
+  public:
+  Mapa();
+  int buscaHex(int posX, int posY);
+  int orbita(int number_hex);
+  
+};
 
 class Corpo {
   private:
@@ -42,11 +60,12 @@ class Fisica {
   private:
     ListaDeCorpos *lista;
     int k, b;
+    
 
   public:
     Fisica(ListaDeCorpos *ldc, int k, int b);
     void add_corpo(Corpo *c);
-    void choque(int impulso);
+    void impulso();
     void update(float deltaT, int tamTela);
 };
 
