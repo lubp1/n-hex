@@ -15,6 +15,7 @@ int main (){
   Audio::Sample *asample;
   asample = new Audio::Sample();
   asample->load("assets/blip.dat");
+  Mapa* mapa = new Mapa();
 
   Audio::Player *player;
   player = new Audio::Player();
@@ -25,9 +26,9 @@ int main (){
   ListaDeCorpos *l = new ListaDeCorpos();
   l->add_corpo(c1);
 
-  Fisica *f = new Fisica(l, 15, 3);
+  Fisica *f = new Fisica(l, mapa);
 
-  Tela *tela = new Tela(l, 20, 20, 20, 20);
+  Tela *tela = new Tela(l, 20, 20, 20, 20, mapa);
   tela->init();
 
   Teclado *teclado = new Teclado();

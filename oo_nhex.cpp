@@ -70,10 +70,9 @@ std::vector<Corpo*> *ListaDeCorpos::get_corpos() {
   return (this->corpos);
 }
 
-Fisica::Fisica(ListaDeCorpos *ldc, int k, int b) {
+Fisica::Fisica(ListaDeCorpos *ldc, Mapa* mapa) {
   this->lista = ldc;
-  this->k = k;
-  this->b = b;
+  this->mapa = mapa;
 }
 
 void Fisica::update(float deltaT, int tamTela) {
@@ -104,16 +103,93 @@ void Fisica::update(float deltaT, int tamTela) {
 
 
 void Fisica::impulso() {
-  
+
   std::vector<Corpo *> *c = this->lista->get_corpos();
 
   int posX = (int)((*c)[0])->get_posX();
   int posY = (int)((*c)[0])->get_posY();
-  
-  int hex_number = buscaHex(posX, posY);
+
+  int hex_number = this->mapa->buscaHex(posX, posY);
 
   printw("X= %d", posX);
   printw("\nY= %d", posY);
+
+}
+
+
+Mapa::Mapa() {
+  this->listaX_Hex = (int*)malloc(8*sizeof(int));
+  this->listaY_Hex = (int*)malloc(8*sizeof(int));
+
+  this->orb1X = (int*)malloc(2*sizeof(int));
+  this->orb1Y = (int*)malloc(2*sizeof(int));
+  this->orb2X = (int*)malloc(8*sizeof(int));
+  this->orb2Y = (int*)malloc(8*sizeof(int));
+  this->orb3X = (int*)malloc(12*sizeof(int));
+  this->orb3Y = (int*)malloc(12*sizeof(int));
+  this->orb4X = (int*)malloc(18*sizeof(int));
+  this->orb4Y = (int*)malloc(18*sizeof(int));
+
+
+  // posicoes em X dos hexagonos
+  this->listaX_Hex[0] = this->listaX_Hex[1] = this->listaX_Hex[2] = 13;
+  this->listaX_Hex[3] = this->listaX_Hex[4] = 25;
+  this->listaX_Hex[5] = this->listaX_Hex[6] = this->listaX_Hex[7] = 38;
+
+  // posicoes em Y dos hexagonos
+  this->listaY_Hex[0] = this->listaY_Hex[5] = 34;
+  this->listaY_Hex[1] = this->listaY_Hex[6] = 101;
+  this->listaY_Hex[2] = this->listaY_Hex[7] = 167;
+  this->listaY_Hex[3] = 57;
+  this->listaY_Hex[4] = 144;
+
+
+  // orbita mais interna
+  this->orb1X[0] = this->orb1X[1] = 0;
+  this->orb1Y[0] = -1;
+  this->orb1Y[1] = 1;
+
+  this->orb2X[0] = this->orb2X[4] = 0;
+  this->orb2X[1] = this->orb2X[2] = this->orb2X[3] = 1;
+  this->orb2X[5] = this->orb2X[6] = this->orb2X[7] = -1;
+  this->orb2Y[0] = -3;
+  this->orb2Y[1] = this->orb2Y[7] = -2;
+  this->orb2Y[2] = this->orb2Y[6] = 0;
+  this->orb2Y[3] = this->orb2Y[5] = 2;
+  this->orb2Y[4] = 3;
+
+  this->orb3X[0] = this->orb3X[6] = 0;
+  this->orb3X[1] = this->orb3X[5] = 1;
+  this->orb3X[2] = this->orb3X[3] = this->orb3X[4] = 2;
+  this->orb3X[7] = this->orb3X[11] = -1;
+  this->orb3X[8] = this->orb3X[9] = this->orb3X[10] = -2;
+  this->orb3Y[0] = -5;
+  this->orb3Y[1] = this->orb3Y[11] = -4;
+  this->orb3Y[2] = this->orb3Y[10] = -2;
+  this->orb3Y[3] = this->orb3Y[9] = 0;
+  this->orb3Y[4] = this->orb3Y[8] = 2;
+  this->orb3Y[5] = this->orb3Y[7] = 4;
+  this->orb3Y[6] = 5;
+
+  // Orbita mais externa
+  this->orb4X[0] = this->orb4X[9] = 0;
+  this->orb4X[1] = this->orb4X[8] = 1;
+  this->orb4X[2] = this->orb4X[7] = 2;
+  this->orb4X[3] = this->orb4X[4] = this->orb4X[5] = this->orb4X[6] = 3;
+  this->orb4X[10] = this->orb4X[17] = -1;
+  this->orb4X[11] = this->orb4X[16] = -2;
+  this->orb4X[12] = this->orb4X[13] = this->orb4X[14] = this->orb4X[15] = -3;
+  this->orb4Y[0] = -6;
+  this->orb4Y[1] = this->orb4Y[17] = -5;
+  this->orb4Y[2] = this->orb4Y[16] = -4;
+  this->orb4Y[3] = this->orb4Y[15] = -3;
+  this->orb4Y[4] = this->orb4Y[14] = -1;
+  this->orb4Y[5] = this->orb4Y[13] = 1;
+  this->orb4Y[6] = this->orb4Y[12] = 3;
+  this->orb4Y[7] = this->orb4Y[11] = 4;
+  this->orb4Y[8] = this->orb4Y[10] = 5;
+  this->orb4Y[9] = 6;
+
 
 }
 
@@ -123,7 +199,7 @@ int Mapa::buscaHex(int posX, int posY){
   int hex_number;
 
   for(int i=0; i< sizeof(this->listaX_Hex)/(sizeof(int)); i++){
-      new_dist = abs(listaX_Hex[i] - posX) + abs(listaY_Hex[i] - posY); 
+      new_dist = abs(listaX_Hex[i] - posX) + abs(listaY_Hex[i] - posY);
 
       if(new_dist < min_dist){
         min_dist = new_dist;
@@ -135,7 +211,22 @@ int Mapa::buscaHex(int posX, int posY){
 }
 
 
-Tela::Tela(ListaDeCorpos *ldc, int maxI, int maxJ, float maxX, float maxY) {
+Mapa::~Mapa() {
+  free(this->listaX_Hex);
+  free(this->listaY_Hex);
+
+  free(this->orb1X);
+  free(this->orb1Y);
+  free(this->orb2X);
+  free(this->orb2Y);
+  free(this->orb3X);
+  free(this->orb3Y);
+  free(this->orb4X);
+  free(this->orb4Y);
+}
+
+
+Tela::Tela(ListaDeCorpos *ldc, int maxI, int maxJ, float maxX, float maxY, Mapa* mapa) {
   this->lista = ldc;
   this->lista_anterior = new ListaDeCorpos();
   this->lista_anterior->hard_copy(this->lista);
@@ -143,6 +234,7 @@ Tela::Tela(ListaDeCorpos *ldc, int maxI, int maxJ, float maxX, float maxY) {
   this->maxJ = maxJ;
   this->maxX = maxX;
   this->maxY = maxY;
+  this->mapa = mapa;
 }
 
 void Tela::init() {
@@ -215,21 +307,6 @@ Tela::~Tela() {
 }
 
 
-/*
-class Teclado {
-  private:
-    char ultima_captura;
-    int rodando;
-
-  public:
-    Teclado();
-    ~Teclado();
-    void stop();
-    void init();
-    char getchar();
-}
-
-*/
 
 void threadfun (char *keybuffer, int *control)
 {

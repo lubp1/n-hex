@@ -9,7 +9,7 @@
 #define  MIN_X 2
 
 
-class Mapa(){
+class Mapa {
   private:
   int* listaX_Hex;
   int* listaY_Hex;
@@ -23,7 +23,7 @@ class Mapa(){
   Mapa();
   int buscaHex(int posX, int posY);
   int orbita(int number_hex);
-  
+  ~Mapa();
 };
 
 class Corpo {
@@ -59,11 +59,11 @@ class ListaDeCorpos {
 class Fisica {
   private:
     ListaDeCorpos *lista;
-    int k, b;
-    
+    Mapa* mapa;
+
 
   public:
-    Fisica(ListaDeCorpos *ldc, int k, int b);
+    Fisica(ListaDeCorpos *ldc, Mapa* mapa);
     void add_corpo(Corpo *c);
     void impulso();
     void update(float deltaT, int tamTela);
@@ -75,10 +75,11 @@ class Tela {
     int maxI, maxJ;
     float maxX, maxY;
     int row, col;
+    Mapa* mapa;
 
 
   public:
-    Tela(ListaDeCorpos *ldc, int maxI, int maxJ, float maxX, float maxY);
+    Tela(ListaDeCorpos *ldc, int maxI, int maxJ, float maxX, float maxY, Mapa* mapa);
     ~Tela();
     void stop();
     void init();
