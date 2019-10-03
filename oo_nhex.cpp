@@ -2,7 +2,6 @@
 #include <chrono>
 #include <thread>
 #include <iostream>
-#include "01-playback.hpp"
 #include "oo_nhex.hpp"
 #include <cstdlib>
 #include <ncurses.h>
@@ -156,12 +155,20 @@ Mapa::Mapa() {
 
 }
 
+
+int* Mapa::get_listaX() {
+  return this->listaX_Hex;
+}
+int* Mapa::get_listaY() {
+  return this->listaY_Hex;
+}
+
 int Mapa::buscaHex(int posX, int posY){
   int new_dist=0;
-  int min_dist=200;
-  int hex_number;
+  int min_dist=1000000;
+  int hex_number = 0;
 
-  for(int i=0; i< sizeof(this->listaX_Hex)/(sizeof(int)); i++){
+  for(int i=0; i<8; i++){
       new_dist = (listaX_Hex[i] - posX)*(listaX_Hex[i] - posX) + (listaY_Hex[i] - posY)*(listaY_Hex[i] - posY);
 
       if(new_dist < min_dist){
@@ -194,6 +201,11 @@ char Mapa::orbita(int x, int y, int hex) {
   }
 
   return '0';
+}
+
+
+char Mapa::rotacao(int x, int y, int vx, int vy, char orb, int hex) {
+
 }
 
 
@@ -282,6 +294,11 @@ void Tela::init() {
   this->row = 50;
   this->col = 200;
 
+  // Limpando a tela
+  erase();
+
+
+  // Imprimindo bordas
   int i;
   for (i=0;i<201;i++) {
     move(0,i);
@@ -294,6 +311,37 @@ void Tela::init() {
     echochar('|');
     move(i,201);
     echochar('|');
+  }
+
+  // Imprimindo os hexagonos
+  int* hexX = this->mapa->get_listaX();
+  int* hexY = this->mapa->get_listaY();
+  for (i=0;i<8; i++) {
+
+    //Centro do hexagono
+    move(hexX[i],hexY[i]);
+    echochar('0');
+
+    // Lados inclinados
+    int j;
+    for (j=0;j<4;j++) {
+      move(hexX[i]-j,hexY[i]-8+j);
+      echochar('/');
+      move(hexX[i]-j,hexY[i]+8-j);
+      echochar('\\');
+      move(hexX[i]+1+j,hexY[i]-8+j);
+      echochar('\\');
+      move(hexX[i]+1+j,hexY[i]+8-j);
+      echochar('/');
+    }
+
+    // Lados retos
+    for(j=0;j<9;j++) {
+      move(hexX[i]-4,hexY[i]-4+j);
+      echochar('_');
+      move(hexX[i]+4,hexY[i]-4+j);
+      echochar('_');
+    }
   }
 
 }
@@ -326,8 +374,39 @@ void Tela::update() {
     x_pos = (int) ((*corpos_old)[k]->get_posX());
     y_pos = (int) ((*corpos_old)[k]->get_posY());
 
+
     move(x_pos, y_pos);   /* Move cursor to position */
     echochar(' ');  /* Prints character, advances a position */
+
+    // Reimprimindo o hexagono mais proximo, para caso ele tenha sido apagado
+    int hex = this->mapa->buscaHex(x_pos, y_pos);
+    int* hexX = this->mapa->get_listaX();
+    int* hexY = this->mapa->get_listaY();
+
+    //Centro do hexagono
+    move(hexX[hex],hexY[hex]);
+    echochar('0');
+
+    // Lados inclinados
+    int j;
+    for (j=0;j<4;j++) {
+      move(hexX[hex]-j,hexY[hex]-8+j);
+      echochar('/');
+      move(hexX[hex]-j,hexY[hex]+8-j);
+      echochar('\\');
+      move(hexX[hex]+1+j,hexY[hex]-8+j);
+      echochar('\\');
+      move(hexX[hex]+1+j,hexY[hex]+8-j);
+      echochar('/');
+    }
+
+    // Lados retos
+    for(j=0;j<9;j++) {
+      move(hexX[hex]-4,hexY[hex]-4+j);
+      echochar('_');
+      move(hexX[hex]+4,hexY[hex]-4+j);
+      echochar('_');
+    }
   }
 
   // Desenha corpos na tela

@@ -56,6 +56,9 @@ class Mapa {
   Mapa();
   int buscaHex(int posX, int posY);
   char orbita(int x, int y, int hex);
+  char rotacao(int x, int y, int vx, int vy, char orb, int hex);
+  int* get_listaX();
+  int* get_listaY();
   ~Mapa();
 };
 

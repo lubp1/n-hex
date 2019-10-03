@@ -2,7 +2,6 @@
 #include <chrono>
 #include <thread>
 #include <vector>
-#include "01-playback.hpp"
 
 #include "oo_nhex.hpp"
 
@@ -12,19 +11,16 @@ uint64_t get_now_ms() {
 }
 
 int main (){
-  Audio::Sample *asample;
-  asample = new Audio::Sample();
-  asample->load("assets/blip.dat");
   Mapa* mapa = new Mapa();
 
-  Audio::Player *player;
-  player = new Audio::Player();
-  player->init();
-
   Corpo *c1 = new Corpo(10, 10, 10, 10);
+  //Corpo *c2 = new Corpo(10, 10, 20, 30);
+  //Corpo *c3 = new Corpo(10, 10, 10, 40);
 
   ListaDeCorpos *l = new ListaDeCorpos();
   l->add_corpo(c1);
+  //l->add_corpo(c2);
+  //l->add_corpo(c3);
 
   Fisica *f = new Fisica(l, mapa);
 
@@ -44,7 +40,6 @@ int main (){
 
   T = get_now_ms();
   t1 = T;
-  player->play(asample);
 
   while (1) {
     // Atualiza timers
@@ -62,8 +57,6 @@ int main (){
     char c = teclado->getchar();
 
     if (c==' ') {
-       // Reproduz som
-      asample->set_position(0);
       f->impulso();
     }
     else if (c=='q') {
@@ -77,7 +70,6 @@ int main (){
     i++;
   }
 
-  player->stop();       // Termina o audio
   tela->stop();
   teclado->stop();
   return 0;
