@@ -13,7 +13,7 @@ uint64_t get_now_ms() {
 int main (){
   Mapa* mapa = new Mapa();
 
-  Corpo *c1 = new Corpo(10, 10, 10, 10);
+  Corpo *c1 = new Corpo(0, -10, 15, 100);
   //Corpo *c2 = new Corpo(10, 10, 20, 30);
   //Corpo *c3 = new Corpo(10, 10, 10, 40);
 

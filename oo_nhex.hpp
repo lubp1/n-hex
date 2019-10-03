@@ -17,6 +17,7 @@ class Corpo {
   float posX;
   char orb;
   char rot;
+  int pos_orb;
 
   public:
   Corpo(float vX, float vY, float posX, float posY);
@@ -29,6 +30,8 @@ class Corpo {
   char get_orb();
   void set_rot(char rot);
   char get_rot();
+  int get_pos_orb();
+  void set_pos_orb(int pos_orb);
 };
 
 class ListaDeCorpos {
@@ -55,10 +58,18 @@ class Mapa {
   public:
   Mapa();
   int buscaHex(int posX, int posY);
-  char orbita(int x, int y, int hex);
+  char orbita(int x, int y, int hex, Corpo *c);
   char rotacao(int x, int y, int vx, int vy, char orb, int hex);
   int* get_listaX();
   int* get_listaY();
+  int* get_orb1X();
+  int* get_orb2X();
+  int* get_orb3X();
+  int* get_orb4X();
+  int* get_orb1Y();
+  int* get_orb2Y();
+  int* get_orb3Y();
+  int* get_orb4Y();
   ~Mapa();
 };
 

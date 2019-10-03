@@ -13,8 +13,8 @@ Corpo::Corpo(float vX, float vY, float posX, float posY) {
   this->velY = vY;
   this->posX = posX;
   this->posY = posY;
-  this->orb = '0';
-  this->rot = '0';
+  this->orb = 0;
+  this->rot = 0;
 }
 
 void Corpo::update(float new_velX, float new_velY, float new_posX, float new_posY) {
@@ -27,33 +27,32 @@ void Corpo::update(float new_velX, float new_velY, float new_posX, float new_pos
 float Corpo::get_velY() {
   return this->velY;
 }
-
 float Corpo::get_velX() {
   return this->velX;
 }
-
 float Corpo::get_posY() {
   return this->posY;
 }
-
 float Corpo::get_posX() {
   return this->posX;
 }
-
 void Corpo::set_orb(char orb){
   this->orb = orb;
 }
-
 char Corpo::get_orb(){
   return this->orb;
 }
-
 void Corpo::set_rot(char rot){
   this->rot = rot;
 }
-
 char Corpo::get_rot(){
   return this->rot;
+}
+int Corpo::get_pos_orb(){
+  return this->pos_orb;
+}
+void Corpo::set_pos_orb(int pos_orb){
+  this->pos_orb = pos_orb;
 }
 
 ListaDeCorpos::ListaDeCorpos() {
@@ -162,6 +161,30 @@ int* Mapa::get_listaX() {
 int* Mapa::get_listaY() {
   return this->listaY_Hex;
 }
+int* Mapa::get_orb1X(){
+  return this->orb1X;
+}
+int* Mapa::get_orb2X(){
+  return this->orb2X;
+}
+int* Mapa::get_orb3X(){
+  return this->orb3X;
+}
+int* Mapa::get_orb4X(){
+  return this->orb4X;
+}
+int* Mapa::get_orb1Y(){
+  return this->orb1Y;
+}
+int* Mapa::get_orb2Y(){
+  return this->orb2Y;
+}
+int* Mapa::get_orb3Y(){
+  return this->orb3Y;
+}
+int* Mapa::get_orb4Y(){
+  return this->orb4Y;
+}
 
 int Mapa::buscaHex(int posX, int posY){
   int new_dist=0;
@@ -179,33 +202,49 @@ int Mapa::buscaHex(int posX, int posY){
   return hex_number;
 }
 
-char Mapa::orbita(int x, int y, int hex) {
+char Mapa::orbita(int x, int y, int hex, Corpo *c) {
   int i;
-
-  x = x - this->listaX_Hex[hex];
-  y = y - this->listaY_Hex[hex];
+  // Calculo posicoes relativas
+  x =(int)(x - this->listaX_Hex[hex]);
+  y =(int)(y - this->listaY_Hex[hex]);
 
   for (i=0;i<18;i++) {
+    //Orbita 1
     if (i < 2 && x == this->orb1X[i] && y == this->orb1Y[i]) {
-      return '1';
+      c->set_pos_orb(i);
+      return 1;
     }
+    //Orbita 2
     if (i < 8 && x == this->orb2X[i] && y == this->orb2Y[i]) {
-      return '2';
+      c->set_pos_orb(i);
+      return 2;
     }
+    //Orbita 3
     if (i < 12 && x == this->orb3X[i] && y == this->orb3Y[i]) {
-      return '3';
+      c->set_pos_orb(i);
+      return 3;
     }
+    //Orbita 4
     if (i < 18 && x == this->orb4X[i] && y == this->orb4Y[i]) {
-      return '4';
+      c->set_pos_orb(i);
+      return 4;
     }
   }
 
-  return '0';
+  return 0;
 }
 
-
 char Mapa::rotacao(int x, int y, int vx, int vy, char orb, int hex) {
+  char sentido; 
+  // calcula sentido de rotacao           
+  sentido = vy * (x - this->listaX_Hex[hex]);
+      // >= 0   -    horario
+  if(sentido >= 0)    
+    sentido = 'h';        // horario
+  else if(sentido < 0)     
+    sentido = 'a';        // anti-horario
 
+  return sentido;      
 }
 
 
@@ -224,9 +263,6 @@ Mapa::~Mapa() {
 }
 
 
-
-
-
 Fisica::Fisica(ListaDeCorpos *ldc, Mapa* mapa) {
   this->lista = ldc;
   this->mapa = mapa;
@@ -235,29 +271,107 @@ Fisica::Fisica(ListaDeCorpos *ldc, Mapa* mapa) {
 void Fisica::update(float deltaT, int tamTela) {
   // Atualiza parametros dos corpos!
   std::vector<Corpo *> *c = this->lista->get_corpos();
+  // Atualiza posicoes dos corpos
   for (int i = 0; i < (*c).size(); i++) {
-    float new_velX, new_velY, new_posX, new_posY;
+    float new_velX = ((*c)[i])->get_velX();
+    float new_velY = ((*c)[i])->get_velY();
+    float new_posX, new_posY;
+    
+    // Se nao estiver orbitando
+    if((*c)[i]->get_orb() == 0){
+      if(((*c)[i])->get_posX() <= MIN_X || ((*c)[i])->get_posX() >= MAX_X){
+        new_velX =  (-1)*((*c)[i])->get_velX();
+      }
+      else{
+        new_velX = ((*c)[i])->get_velX();
+      }
+      if(((*c)[i])->get_posY() <= MIN_Y || ((*c)[i])->get_posY() >= MAX_Y){
+        new_velY =  (-1)*((*c)[i])->get_velY();
+      }
+      else{
+        new_velY = ((*c)[i])->get_velY();
+      }
 
-    if(((*c)[i])->get_posX() <= MIN_X || ((*c)[i])->get_posX() >= MAX_X){
-      new_velX =  (-1)*((*c)[i])->get_velX();
+      new_posX = (*c)[i]->get_posX() + (int)deltaT * new_velX/1000;
+      new_posY = (*c)[i]->get_posY() + (int)deltaT * new_velY/1000;
     }
-    else{
-      new_velX = ((*c)[i])->get_velX();
-    }
-    if(((*c)[i])->get_posY() <= MIN_Y || ((*c)[i])->get_posY() >= MAX_Y){
-      new_velY =  (-1)*((*c)[i])->get_velY();
-    }
-    else{
-      new_velY = ((*c)[i])->get_velY();
+    
+    // Se estiver em orbita
+    else if((*c)[i]->get_orb() == 1){
+      // Avanca uma posicao no hexagono
+      if((*c)[i]->get_rot() == 'h'){
+        (*c)[i]->set_pos_orb( ((*c)[i]->get_pos_orb() + 1)%2);
+      }
+      else if((*c)[i]->get_rot() == 'a'){
+        (*c)[i]->set_pos_orb( (*c)[i]->get_pos_orb() - 1);
+        if ((*c)[i]->get_pos_orb() == -1) {
+          (*c)[i]->set_pos_orb(1);
+        }
+      }
+     new_posX =  this->mapa->get_listaX()[this->mapa->buscaHex((*c)[i]->get_posX(), (*c)[i]->get_posY())] + \
+                  this->mapa->get_orb1X()[((*c)[i])->get_pos_orb()];
+                  
+      new_posY =  this->mapa->get_listaY()[this->mapa->buscaHex((*c)[i]->get_posX(), (*c)[i]->get_posY())] + \
+                  this->mapa->get_orb1Y()[((*c)[i])->get_pos_orb()]; 
     }
 
-    new_posX = (*c)[i]->get_posX() + (int)deltaT * new_velX/1000;
-    new_posY = (*c)[i]->get_posY() + (int)deltaT * new_velY/1000;
+    else if((*c)[i]->get_orb() == 2){
+      // Avanca uma posicao no hexagono
+      if((*c)[i]->get_rot() == 'h'){
+        (*c)[i]->set_pos_orb( ((*c)[i]->get_pos_orb() + 1)%8);
+      }
+      else if((*c)[i]->get_rot() == 'a'){
+        (*c)[i]->set_pos_orb( ((*c)[i]->get_pos_orb() - 1)%8);
+        if ((*c)[i]->get_pos_orb() == -1) {
+          (*c)[i]->set_pos_orb(7);
+        }
+      }
+      new_posX =  this->mapa->get_listaX()[this->mapa->buscaHex((*c)[i]->get_posX(), (*c)[i]->get_posY())] + \
+                  this->mapa->get_orb2X()[((*c)[i])->get_pos_orb()];
+                  
+      new_posY =  this->mapa->get_listaY()[this->mapa->buscaHex((*c)[i]->get_posX(), (*c)[i]->get_posY())] + \
+                  this->mapa->get_orb2Y()[((*c)[i])->get_pos_orb()]; 
+    }
+
+    else if((*c)[i]->get_orb() == 3){
+      // Avanca uma posicao no hexagono
+      if((*c)[i]->get_rot() == 'h'){
+        (*c)[i]->set_pos_orb( ((*c)[i]->get_pos_orb() + 1)%12);
+      }
+      else if((*c)[i]->get_rot() == 'a'){
+        (*c)[i]->set_pos_orb( ((*c)[i]->get_pos_orb() - 1)%12);
+        if ((*c)[i]->get_pos_orb() == -1) {
+          (*c)[i]->set_pos_orb(11);
+        }
+      }
+      new_posX =  this->mapa->get_listaX()[this->mapa->buscaHex((*c)[i]->get_posX(), (*c)[i]->get_posY())] + \
+                  this->mapa->get_orb3X()[((*c)[i])->get_pos_orb()];
+                  
+      new_posY =  this->mapa->get_listaY()[this->mapa->buscaHex((*c)[i]->get_posX(), (*c)[i]->get_posY())] + \
+                  this->mapa->get_orb3Y()[((*c)[i])->get_pos_orb()]; 
+    }
+
+    else if((*c)[i]->get_orb() == 4){
+      // Avanca uma posicao no hexagono
+      if((*c)[i]->get_rot() == 'h'){
+        (*c)[i]->set_pos_orb( ((*c)[i]->get_pos_orb() + 1)%18);
+      }
+      else if((*c)[i]->get_rot() == 'a'){
+        (*c)[i]->set_pos_orb( ((*c)[i]->get_pos_orb() - 1)%18);
+        if ((*c)[i]->get_pos_orb() == -1) {
+          (*c)[i]->set_pos_orb(17);
+        }
+      }
+      new_posX =  this->mapa->get_listaX()[this->mapa->buscaHex((*c)[i]->get_posX(), (*c)[i]->get_posY())] + \
+                  this->mapa->get_orb4X()[((*c)[i])->get_pos_orb()];
+                  
+      new_posY =  this->mapa->get_listaY()[this->mapa->buscaHex((*c)[i]->get_posX(), (*c)[i]->get_posY())] + \
+                  this->mapa->get_orb4Y()[((*c)[i])->get_pos_orb()]; 
+    }
 
     (*c)[i]->update(new_velX, new_velY, new_posX,  new_posY);
   }
 }
-
 
 void Fisica::impulso() {
 
@@ -266,10 +380,69 @@ void Fisica::impulso() {
   int posX = (int)((*c)[0])->get_posX();
   int posY = (int)((*c)[0])->get_posY();
 
+  if(((*c)[0])->get_orb() != 0){
+    // Se estiver orbitando
+    // Sai da orbita
+    int deltaX, deltaY, newVelX, newVelY;   
+    if ((*c)[0]->get_rot() == 'h') {
+      if((*c)[0]->get_orb() == 1){
+        deltaX = this->mapa->get_orb1X()[((*c)[0])->get_pos_orb()] - this->mapa->get_orb1X()[((*c)[0])->get_pos_orb() - 1];
+        deltaY = this->mapa->get_orb1Y()[((*c)[0])->get_pos_orb()] - this->mapa->get_orb1Y()[((*c)[0])->get_pos_orb() - 1]; 
+      }
+      else if((*c)[0]->get_orb() == 2){
+        deltaX = this->mapa->get_orb2X()[((*c)[0])->get_pos_orb()] - this->mapa->get_orb2X()[((*c)[0])->get_pos_orb() - 1];
+        deltaY = this->mapa->get_orb2Y()[((*c)[0])->get_pos_orb()] - this->mapa->get_orb2Y()[((*c)[0])->get_pos_orb() - 1];
+      }
+      else if((*c)[0]->get_orb() == 3){
+        deltaX = this->mapa->get_orb3X()[((*c)[0])->get_pos_orb()] - this->mapa->get_orb3X()[((*c)[0])->get_pos_orb() - 1];
+        deltaY = this->mapa->get_orb3Y()[((*c)[0])->get_pos_orb()] - this->mapa->get_orb3Y()[((*c)[0])->get_pos_orb() - 1];
+      }
+      else if((*c)[0]->get_orb() == 4){
+        deltaX = this->mapa->get_orb4X()[((*c)[0])->get_pos_orb()] - this->mapa->get_orb4X()[((*c)[0])->get_pos_orb() - 1];
+        deltaY = this->mapa->get_orb4Y()[((*c)[0])->get_pos_orb()] - this->mapa->get_orb4Y()[((*c)[0])->get_pos_orb() - 1];
+      }  
+    } 
+    else if ((*c)[0]->get_rot() == 'a') {
+      if((*c)[0]->get_orb() == 1){
+        deltaX = this->mapa->get_orb1X()[((*c)[0])->get_pos_orb()] - this->mapa->get_orb1X()[((*c)[0])->get_pos_orb() + 1];
+        deltaY = this->mapa->get_orb1Y()[((*c)[0])->get_pos_orb()] - this->mapa->get_orb1Y()[((*c)[0])->get_pos_orb() + 1]; 
+      }
+      else if((*c)[0]->get_orb() == 2){
+        deltaX = this->mapa->get_orb2X()[((*c)[0])->get_pos_orb()] - this->mapa->get_orb2X()[((*c)[0])->get_pos_orb() + 1];
+        deltaY = this->mapa->get_orb2Y()[((*c)[0])->get_pos_orb()] - this->mapa->get_orb2Y()[((*c)[0])->get_pos_orb() + 1];
+      }
+      else if((*c)[0]->get_orb() == 3){
+        deltaX = this->mapa->get_orb3X()[((*c)[0])->get_pos_orb()] - this->mapa->get_orb3X()[((*c)[0])->get_pos_orb() + 1];
+        deltaY = this->mapa->get_orb3Y()[((*c)[0])->get_pos_orb()] - this->mapa->get_orb3Y()[((*c)[0])->get_pos_orb() + 1];
+      }
+      else if((*c)[0]->get_orb() == 4){
+        deltaX = this->mapa->get_orb4X()[((*c)[0])->get_pos_orb()] - this->mapa->get_orb4X()[((*c)[0])->get_pos_orb() + 1];
+        deltaY = this->mapa->get_orb4Y()[((*c)[0])->get_pos_orb()] - this->mapa->get_orb4Y()[((*c)[0])->get_pos_orb() + 1];
+      }
+    }
+    if (deltaX >= 0) {
+      newVelX = 10;
+    } else {
+      newVelX = -10;
+    }
+
+    if (deltaY >= 0) {
+      newVelY = 10;
+    } else {
+      newVelY = -10;
+    }
+
+    ((*c)[0])->update(newVelX,newVelY,(*c)[0]->get_posX(),(*c)[0]->get_posY());
+    ((*c)[0])->set_orb(0);
+    return;
+  }
+
   int hex_number = this->mapa->buscaHex(posX, posY);
-  char orbita = this->mapa->orbita(posX, posY, hex_number);
+  char orbita = this->mapa->orbita(posX, posY, hex_number, *(c->data()));
+  char rotacao = this->mapa->rotacao(posX, posY, (int)((*c)[0])->get_velX(), (int)((*c)[0])->get_velY(), orbita, hex_number);
 
   (*c)[0]->set_orb(orbita);
+  (*c)[0]->set_rot(rotacao);
 }
 
 
