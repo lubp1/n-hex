@@ -13,8 +13,8 @@ uint64_t get_now_ms() {
 int main (){
   Mapa* mapa = new Mapa();
 
-  Corpo *c1 = new Corpo(0, -10, 15, 100);
-  Corpo *c2 = new Corpo(0, 10, 15, 30);
+  Corpo *c1 = new Corpo(0, -10, 15, 100); //nave
+  Corpo *c2 = new Corpo(0, 10, 15, 30);   //corpo colisao
   Corpo *c3 = new Corpo(10, 10, 10, 40);
   Corpo *c4 = new Corpo(10, 0, 10, 20);
   Corpo *c5 = new Corpo(-10, 10, 10, 30);
@@ -22,7 +22,16 @@ int main (){
   Corpo *c7 = new Corpo(10, 10, 20, 140);
   Corpo *c8 = new Corpo(10, 10, 10, 120);
 
+  // #define RAND_MAX 10
+  // Corpo **c = (Corpo **)malloc(100 * sizeof(Corpo *));
+  // ListaDeCorpos *l = new ListaDeCorpos();
+
+  // for(int i=0; i<100; i++){
+  //   Corpo *c[i] = {new Corpo(rand()-10, rand()-10, rand(), rand())};
+  //   l->add_corpo( c[i]);
+  // }
   ListaDeCorpos *l = new ListaDeCorpos();
+  
   l->add_corpo(c1);
   l->add_corpo(c2);
   l->add_corpo(c3);
