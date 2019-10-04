@@ -101,7 +101,7 @@ Mapa::Mapa() {
   this->listaY_Hex[0] = this->listaY_Hex[5] = 34;
   this->listaY_Hex[1] = this->listaY_Hex[6] = 101;
   this->listaY_Hex[2] = this->listaY_Hex[7] = 167;
-  this->listaY_Hex[3] = 57;
+  this->listaY_Hex[3] = 63;
   this->listaY_Hex[4] = 144;
 
 
@@ -235,16 +235,16 @@ char Mapa::orbita(int x, int y, int hex, Corpo *c) {
 }
 
 char Mapa::rotacao(int x, int y, int vx, int vy, char orb, int hex) {
-  char sentido; 
-  // calcula sentido de rotacao           
+  char sentido;
+  // calcula sentido de rotacao
   sentido = vy * (x - this->listaX_Hex[hex]);
       // >= 0   -    horario
-  if(sentido >= 0)    
+  if(sentido >= 0)
     sentido = 'h';        // horario
-  else if(sentido < 0)     
+  else if(sentido < 0)
     sentido = 'a';        // anti-horario
 
-  return sentido;      
+  return sentido;
 }
 
 
@@ -276,7 +276,7 @@ void Fisica::update(float deltaT, int tamTela) {
     float new_velX = ((*c)[i])->get_velX();
     float new_velY = ((*c)[i])->get_velY();
     float new_posX, new_posY;
-    
+
     // Se nao estiver orbitando
     if((*c)[i]->get_orb() == 0){
       if(((*c)[i])->get_posX() <= MIN_X || ((*c)[i])->get_posX() >= MAX_X){
@@ -292,10 +292,18 @@ void Fisica::update(float deltaT, int tamTela) {
         new_velY = ((*c)[i])->get_velY();
       }
 
+
+      for (int j = 0; j < (*c).size(); j++) {
+        if(i != j && (*c)[i]->get_posX() == (*c)[j]->get_posX() && (*c)[i]->get_posY() == (*c)[j]->get_posY()) {
+          (*c)[i]->update(-(*c)[i]->get_velX(), -(*c)[i]->get_velY(), (*c)[i]->get_posX(),  (*c)[i]->get_posY());
+          (*c)[j]->update(-(*c)[j]->get_velX(), -(*c)[j]->get_velY(), (*c)[j]->get_posX(),  (*c)[j]->get_posY());
+        }
+      }
+
       new_posX = (*c)[i]->get_posX() + (int)deltaT * new_velX/1000;
       new_posY = (*c)[i]->get_posY() + (int)deltaT * new_velY/1000;
     }
-    
+
     // Se estiver em orbita
     else if((*c)[i]->get_orb() == 1){
       // Avanca uma posicao no hexagono
@@ -308,11 +316,11 @@ void Fisica::update(float deltaT, int tamTela) {
           (*c)[i]->set_pos_orb(1);
         }
       }
-     new_posX =  this->mapa->get_listaX()[this->mapa->buscaHex((*c)[i]->get_posX(), (*c)[i]->get_posY())] + \
+      new_posX =  this->mapa->get_listaX()[this->mapa->buscaHex((*c)[i]->get_posX(), (*c)[i]->get_posY())] + \
                   this->mapa->get_orb1X()[((*c)[i])->get_pos_orb()];
-                  
+
       new_posY =  this->mapa->get_listaY()[this->mapa->buscaHex((*c)[i]->get_posX(), (*c)[i]->get_posY())] + \
-                  this->mapa->get_orb1Y()[((*c)[i])->get_pos_orb()]; 
+                  this->mapa->get_orb1Y()[((*c)[i])->get_pos_orb()];
     }
 
     else if((*c)[i]->get_orb() == 2){
@@ -328,9 +336,9 @@ void Fisica::update(float deltaT, int tamTela) {
       }
       new_posX =  this->mapa->get_listaX()[this->mapa->buscaHex((*c)[i]->get_posX(), (*c)[i]->get_posY())] + \
                   this->mapa->get_orb2X()[((*c)[i])->get_pos_orb()];
-                  
+
       new_posY =  this->mapa->get_listaY()[this->mapa->buscaHex((*c)[i]->get_posX(), (*c)[i]->get_posY())] + \
-                  this->mapa->get_orb2Y()[((*c)[i])->get_pos_orb()]; 
+                  this->mapa->get_orb2Y()[((*c)[i])->get_pos_orb()];
     }
 
     else if((*c)[i]->get_orb() == 3){
@@ -346,9 +354,9 @@ void Fisica::update(float deltaT, int tamTela) {
       }
       new_posX =  this->mapa->get_listaX()[this->mapa->buscaHex((*c)[i]->get_posX(), (*c)[i]->get_posY())] + \
                   this->mapa->get_orb3X()[((*c)[i])->get_pos_orb()];
-                  
+
       new_posY =  this->mapa->get_listaY()[this->mapa->buscaHex((*c)[i]->get_posX(), (*c)[i]->get_posY())] + \
-                  this->mapa->get_orb3Y()[((*c)[i])->get_pos_orb()]; 
+                  this->mapa->get_orb3Y()[((*c)[i])->get_pos_orb()];
     }
 
     else if((*c)[i]->get_orb() == 4){
@@ -364,12 +372,17 @@ void Fisica::update(float deltaT, int tamTela) {
       }
       new_posX =  this->mapa->get_listaX()[this->mapa->buscaHex((*c)[i]->get_posX(), (*c)[i]->get_posY())] + \
                   this->mapa->get_orb4X()[((*c)[i])->get_pos_orb()];
-                  
+
       new_posY =  this->mapa->get_listaY()[this->mapa->buscaHex((*c)[i]->get_posX(), (*c)[i]->get_posY())] + \
-                  this->mapa->get_orb4Y()[((*c)[i])->get_pos_orb()]; 
+                  this->mapa->get_orb4Y()[((*c)[i])->get_pos_orb()];
     }
 
+
+
     (*c)[i]->update(new_velX, new_velY, new_posX,  new_posY);
+
+
+
   }
 }
 
@@ -383,11 +396,11 @@ void Fisica::impulso() {
   if(((*c)[0])->get_orb() != 0){
     // Se estiver orbitando
     // Sai da orbita
-    int deltaX, deltaY, newVelX, newVelY;   
+    int deltaX, deltaY, newVelX, newVelY;
     if ((*c)[0]->get_rot() == 'h') {
       if((*c)[0]->get_orb() == 1){
         deltaX = this->mapa->get_orb1X()[((*c)[0])->get_pos_orb()] - this->mapa->get_orb1X()[((*c)[0])->get_pos_orb() - 1];
-        deltaY = this->mapa->get_orb1Y()[((*c)[0])->get_pos_orb()] - this->mapa->get_orb1Y()[((*c)[0])->get_pos_orb() - 1]; 
+        deltaY = this->mapa->get_orb1Y()[((*c)[0])->get_pos_orb()] - this->mapa->get_orb1Y()[((*c)[0])->get_pos_orb() - 1];
       }
       else if((*c)[0]->get_orb() == 2){
         deltaX = this->mapa->get_orb2X()[((*c)[0])->get_pos_orb()] - this->mapa->get_orb2X()[((*c)[0])->get_pos_orb() - 1];
@@ -400,12 +413,12 @@ void Fisica::impulso() {
       else if((*c)[0]->get_orb() == 4){
         deltaX = this->mapa->get_orb4X()[((*c)[0])->get_pos_orb()] - this->mapa->get_orb4X()[((*c)[0])->get_pos_orb() - 1];
         deltaY = this->mapa->get_orb4Y()[((*c)[0])->get_pos_orb()] - this->mapa->get_orb4Y()[((*c)[0])->get_pos_orb() - 1];
-      }  
-    } 
+      }
+    }
     else if ((*c)[0]->get_rot() == 'a') {
       if((*c)[0]->get_orb() == 1){
         deltaX = this->mapa->get_orb1X()[((*c)[0])->get_pos_orb()] - this->mapa->get_orb1X()[((*c)[0])->get_pos_orb() + 1];
-        deltaY = this->mapa->get_orb1Y()[((*c)[0])->get_pos_orb()] - this->mapa->get_orb1Y()[((*c)[0])->get_pos_orb() + 1]; 
+        deltaY = this->mapa->get_orb1Y()[((*c)[0])->get_pos_orb()] - this->mapa->get_orb1Y()[((*c)[0])->get_pos_orb() + 1];
       }
       else if((*c)[0]->get_orb() == 2){
         deltaX = this->mapa->get_orb2X()[((*c)[0])->get_pos_orb()] - this->mapa->get_orb2X()[((*c)[0])->get_pos_orb() + 1];
@@ -439,6 +452,7 @@ void Fisica::impulso() {
 
   int hex_number = this->mapa->buscaHex(posX, posY);
   char orbita = this->mapa->orbita(posX, posY, hex_number, *(c->data()));
+
   char rotacao = this->mapa->rotacao(posX, posY, (int)((*c)[0])->get_velX(), (int)((*c)[0])->get_velY(), orbita, hex_number);
 
   (*c)[0]->set_orb(orbita);
@@ -590,8 +604,13 @@ void Tela::update() {
     x_pos = (int) ((*corpos)[k]->get_posX());
     y_pos = (int) ((*corpos)[k]->get_posY());
 
-    move(x_pos, y_pos);   /* Move cursor to position */
-    echochar('*');  /* Prints character, advances a position */
+    if (!k) {
+      move(x_pos, y_pos);   /* Move cursor to position */
+      echochar('*');  /* Prints character, advances a position */
+    } else {
+      move(x_pos, y_pos);   /* Move cursor to position */
+      echochar('D');  /* Prints character, advances a position */
+    }
 
     // Atualiza corpos antigos
     (*corpos_old)[k]->update((*corpos)[k]->get_velX(), (*corpos)[k]->get_velY(), (*corpos)[k]->get_posX(), (*corpos)[k]->get_posY());

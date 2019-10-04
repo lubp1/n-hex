@@ -14,13 +14,23 @@ int main (){
   Mapa* mapa = new Mapa();
 
   Corpo *c1 = new Corpo(0, -10, 15, 100);
-  //Corpo *c2 = new Corpo(10, 10, 20, 30);
-  //Corpo *c3 = new Corpo(10, 10, 10, 40);
+  Corpo *c2 = new Corpo(0, 10, 15, 30);
+  Corpo *c3 = new Corpo(10, 10, 10, 40);
+  Corpo *c4 = new Corpo(10, 0, 10, 20);
+  Corpo *c5 = new Corpo(-10, 10, 10, 30);
+  Corpo *c6 = new Corpo(10, 10, 20, 40);
+  Corpo *c7 = new Corpo(10, 10, 20, 140);
+  Corpo *c8 = new Corpo(10, 10, 10, 120);
 
   ListaDeCorpos *l = new ListaDeCorpos();
   l->add_corpo(c1);
-  //l->add_corpo(c2);
-  //l->add_corpo(c3);
+  l->add_corpo(c2);
+  l->add_corpo(c3);
+  l->add_corpo(c4);
+  l->add_corpo(c5);
+  l->add_corpo(c6);
+  l->add_corpo(c7);
+  l->add_corpo(c8);
 
   Fisica *f = new Fisica(l, mapa);
 
