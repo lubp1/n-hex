@@ -231,6 +231,54 @@ char Mapa::orbita(int x, int y, int hex, Corpo *c) {
     }
   }
 
+  int raio = abs(x)+abs(y);
+  if(raio <= 7){
+     int indice_pos, dist, min_dist = 7;
+      // Esta em uma das posicoes vazias do hexagono
+      if(raio == 7 || raio == 5 || (abs(x)==3 && abs(y)==0 )){
+        // Orbita 4
+        for(int j=0; j<18; j++){
+          // Percorre o vetor de pos da orbita 4 e checa a pos mais proxima
+          dist = (x - orb4X[j]) + (y - orb4Y[j]);
+
+          if(dist < min_dist){
+            min_dist = dist;
+            indice_pos = j;
+          }
+        }
+        c->set_pos_orb(indice_pos);
+        return 4;
+      }
+      if(raio == 4 || (abs(x)==2 && abs(y)==1)){
+        // Orbita 3
+        for(int j=0; j<12; j++){
+          // Percorre o vetor de pos da orbita 3 e checa a pos mais proxima
+          dist = (x - orb3X[j]) + (y - orb3Y[j]);
+
+          if(dist < min_dist){
+            min_dist = dist;
+            indice_pos = j;
+          }
+        }
+        c->set_pos_orb(indice_pos);
+        return 3;
+      }
+      if(raio == 2){
+        // Orbita 4
+        for(int j=0; j<8; j++){
+          // Percorre o vetor de pos da orbita 2 e checa a pos mais proxima
+          dist = (x - orb2X[j]) + (y - orb2Y[j]);
+
+          if(dist < min_dist){
+            min_dist = dist;
+            indice_pos = j;
+          }
+        }
+        c->set_pos_orb(indice_pos);
+        return 2;
+      }
+    }
+
   return 0;
 }
 
