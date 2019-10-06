@@ -18,8 +18,10 @@ class Corpo {
   char orb;
   char rot;
   int pos_orb;
+  char cor;
 
   public:
+  Corpo();
   Corpo(float vX, float vY, float posX, float posY);
   void update(float new_velX, float new_velY, float new_posX, float new_posY);
   float get_velY();
@@ -30,6 +32,8 @@ class Corpo {
   char get_orb();
   void set_rot(char rot);
   char get_rot();
+  void set_cor(char cor);
+  char get_cor();
   int get_pos_orb();
   void set_pos_orb(int pos_orb);
 };
@@ -83,7 +87,7 @@ class Fisica {
     Fisica(ListaDeCorpos *ldc, Mapa* mapa);
     void add_corpo(Corpo *c);
     void impulso();
-    void update(float deltaT, int tamTela);
+    int update(float deltaT, int tamTela);
 };
 
 class Tela {

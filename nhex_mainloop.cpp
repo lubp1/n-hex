@@ -22,6 +22,12 @@ int main (){
   Corpo *c7 = new Corpo(10, 10, 20, 140);
   Corpo *c8 = new Corpo(10, 10, 10, 120);
 
+  c4->set_cor(2);
+  c5->set_cor(2);
+  c6->set_cor(2);
+  c7->set_cor(2);
+
+
   // #define RAND_MAX 10
   // Corpo **c = (Corpo **)malloc(100 * sizeof(Corpo *));
   // ListaDeCorpos *l = new ListaDeCorpos();
@@ -31,7 +37,7 @@ int main (){
   //   l->add_corpo( c[i]);
   // }
   ListaDeCorpos *l = new ListaDeCorpos();
-  
+
   l->add_corpo(c1);
   l->add_corpo(c2);
   l->add_corpo(c3);
@@ -67,7 +73,9 @@ int main (){
     deltaT = t1-t0;
 
     // Atualiza modelo
-    f->update(deltaT, tela->getRows());
+    if (f->update(deltaT, tela->getRows())) {
+      break;
+    }
 
     // Atualiza tela
     tela->update();
@@ -78,7 +86,7 @@ int main (){
     if (c==' ') {
       f->impulso();
     }
-    else if (c=='q') {
+    else if (c=='q' || c=='Q') {
       break;
     }
 

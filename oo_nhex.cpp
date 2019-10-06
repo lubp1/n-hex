@@ -15,6 +15,7 @@ Corpo::Corpo(float vX, float vY, float posX, float posY) {
   this->posY = posY;
   this->orb = 0;
   this->rot = 0;
+  this->cor = 0;
 }
 
 void Corpo::update(float new_velX, float new_velY, float new_posX, float new_posY) {
@@ -47,6 +48,13 @@ void Corpo::set_rot(char rot){
 }
 char Corpo::get_rot(){
   return this->rot;
+}
+void Corpo::set_cor(char cor){
+  this->cor = cor;
+}
+
+char Corpo::get_cor(){
+  return this->cor;
 }
 int Corpo::get_pos_orb(){
   return this->pos_orb;
@@ -316,7 +324,7 @@ Fisica::Fisica(ListaDeCorpos *ldc, Mapa* mapa) {
   this->mapa = mapa;
 }
 
-void Fisica::update(float deltaT, int tamTela) {
+int Fisica::update(float deltaT, int tamTela) {
   // Atualiza parametros dos corpos
   std::vector<Corpo *> *c = this->lista->get_corpos();
   // Atualiza posicoes dos corpos
@@ -424,8 +432,8 @@ void Fisica::update(float deltaT, int tamTela) {
       new_posY =  this->mapa->get_listaY()[this->mapa->buscaHex((*c)[i]->get_posX(), (*c)[i]->get_posY())] + \
                   this->mapa->get_orb4Y()[((*c)[i])->get_pos_orb()];
     }
-    
-    
+
+
     (*c)[i]->update(new_velX, new_velY, new_posX,  new_posY);
 
   }
@@ -433,19 +441,36 @@ void Fisica::update(float deltaT, int tamTela) {
   // Checa Colisoes
   for (int i = 0; i < (*c).size(); i++) {
     for (int j=i+1; j < (*c).size(); j++) {
-      if ( ((*c)[i]->get_posX() > ((*c)[j]->get_posX()-1 ))&&((*c)[i]->get_posX() < ((*c)[j]->get_posX()+1 )) 
+      if ( ((*c)[i]->get_posX() > ((*c)[j]->get_posX()-1 ))&&((*c)[i]->get_posX() < ((*c)[j]->get_posX()+1 ))
          &&((*c)[i]->get_posY() > ((*c)[j]->get_posY()-1 ))&&((*c)[i]->get_posY() < ((*c)[j]->get_posY()+1))){
-            // Colisao detectada  
+            // Colisao detectada
             float velXi = (*c)[i]->get_velX();
             float velYi = (*c)[i]->get_velY();
             float velXj = (*c)[j]->get_velX();
             float velYj = (*c)[j]->get_velY();
-            // Troca as velocidades dos dois corpos 
+            if(!i) {
+              if(!(*c)[j]->get_cor()) {
+                (*c)[j]->set_cor(1);
+              }
+              else if ((*c)[j]->get_cor() != 1) {
+                return 1;
+              }
+            }
+            if(!j) {
+              if(!(*c)[i]->get_cor()) {
+                (*c)[i]->set_cor(1);
+              }
+              else if ((*c)[i]->get_cor() != 1) {
+                return 1;
+              }
+            }
+            // Troca as velocidades dos dois corpos
             (*c)[i]->update(velXj, velYj, (*c)[i]->get_posX(), (*c)[i]->get_posY());
             (*c)[j]->update(velXi, velYi, (*c)[j]->get_posX(), (*c)[j]->get_posY());
       }
-    }    
+    }
   }
+  return 0;
 }
 
 void Fisica::impulso() {
@@ -548,6 +573,11 @@ void Tela::init() {
 	raw();				         /* Line buffering disabled	*/
   curs_set(0);           /* Do not display cursor */
 
+
+  start_color();
+  init_pair(0, COLOR_WHITE, COLOR_BLACK);
+  init_pair(1, COLOR_BLUE, COLOR_WHITE);
+  init_pair(2, COLOR_GREEN, COLOR_WHITE);
 
   this->row = 50;
   this->col = 200;
@@ -675,10 +705,14 @@ void Tela::update() {
 
     if (!k) {
       move(x_pos, y_pos);   /* Move cursor to position */
+      attron(COLOR_PAIR(1));
       echochar('*');  /* Prints character, advances a position */
+      attroff(COLOR_PAIR(1));
     } else {
       move(x_pos, y_pos);   /* Move cursor to position */
-      echochar('D');  /* Prints character, advances a position */
+      attron(COLOR_PAIR((*corpos)[k]->get_cor()));
+      echochar('o');  /* Prints character, advances a position */
+      attroff(COLOR_PAIR((*corpos)[k]->get_cor()));
     }
 
     // Atualiza corpos antigos
