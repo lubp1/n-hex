@@ -8,6 +8,8 @@
 
 using namespace std::chrono;
 
+// Classe corpo
+
 Corpo::Corpo(float vX, float vY, float posX, float posY) {
   this->velX = vX;
   this->velY = vY;
@@ -63,11 +65,16 @@ void Corpo::set_pos_orb(int pos_orb){
   this->pos_orb = pos_orb;
 }
 
+
+
+// Classe ListaDeCorpos
+
 ListaDeCorpos::ListaDeCorpos() {
   this->corpos = new std::vector<Corpo *>(0);
 }
 
-void ListaDeCorpos::hard_copy(ListaDeCorpos *ldc) {
+// Funcao para copiar outra lista de corpos
+void ListaDeCorpos::copy(ListaDeCorpos *ldc) {
   std::vector<Corpo *> *corpos = ldc->get_corpos();
 
   for (int k=0; k<corpos->size(); k++) {
@@ -77,7 +84,7 @@ void ListaDeCorpos::hard_copy(ListaDeCorpos *ldc) {
 
 }
 
-
+// Funcao para adicionar um corpo a lista
 void ListaDeCorpos::add_corpo(Corpo *c) {
   (this->corpos)->push_back(c);
 }
@@ -86,10 +93,13 @@ std::vector<Corpo*> *ListaDeCorpos::get_corpos() {
   return (this->corpos);
 }
 
+
+
+// Classe Mapa
+
 Mapa::Mapa() {
   this->listaX_Hex = (int*)malloc(8*sizeof(int));
   this->listaY_Hex = (int*)malloc(8*sizeof(int));
-
   this->orb1X = (int*)malloc(2*sizeof(int));
   this->orb1Y = (int*)malloc(2*sizeof(int));
   this->orb2X = (int*)malloc(8*sizeof(int));
@@ -100,12 +110,12 @@ Mapa::Mapa() {
   this->orb4Y = (int*)malloc(18*sizeof(int));
 
 
-  // posicoes em X dos hexagonos
+  // posicoes em X dos centros dos hexagonos
   this->listaX_Hex[0] = this->listaX_Hex[1] = this->listaX_Hex[2] = 13;
   this->listaX_Hex[3] = this->listaX_Hex[4] = 25;
   this->listaX_Hex[5] = this->listaX_Hex[6] = this->listaX_Hex[7] = 38;
 
-  // posicoes em Y dos hexagonos
+  // posicoes em Y dos centros hexagonos
   this->listaY_Hex[0] = this->listaY_Hex[5] = 34;
   this->listaY_Hex[1] = this->listaY_Hex[6] = 101;
   this->listaY_Hex[2] = this->listaY_Hex[7] = 167;
@@ -162,7 +172,6 @@ Mapa::Mapa() {
 
 }
 
-
 int* Mapa::get_listaX() {
   return this->listaX_Hex;
 }
@@ -194,6 +203,7 @@ int* Mapa::get_orb4Y(){
   return this->orb4Y;
 }
 
+// Funcao que retorna o indice do hexagono mais proximo da posicao dada
 int Mapa::buscaHex(int posX, int posY){
   int new_dist=0;
   int min_dist=1000000;
@@ -210,6 +220,7 @@ int Mapa::buscaHex(int posX, int posY){
   return hex_number;
 }
 
+// Funcao que acha em qual orbita de um hexagono um corpo esta
 char Mapa::orbita(int x, int y, int hex, Corpo *c) {
   int i;
   // Calculo posicoes relativas
@@ -290,6 +301,7 @@ char Mapa::orbita(int x, int y, int hex, Corpo *c) {
   return 0;
 }
 
+// Funcao que indica se o corpo vai orbitar no sentido horario ('h') ou anti horario ('a') do hexagono
 char Mapa::rotacao(int x, int y, int vx, int vy, char orb, int hex) {
   char sentido;
   // calcula sentido de rotacao
@@ -302,7 +314,6 @@ char Mapa::rotacao(int x, int y, int vx, int vy, char orb, int hex) {
 
   return sentido;
 }
-
 
 Mapa::~Mapa() {
   free(this->listaX_Hex);
@@ -319,11 +330,14 @@ Mapa::~Mapa() {
 }
 
 
+// Classe fisica
+
 Fisica::Fisica(ListaDeCorpos *ldc, Mapa* mapa) {
   this->lista = ldc;
   this->mapa = mapa;
 }
 
+// Funcao que atualiza as posicoes dos corpos
 int Fisica::update(float deltaT, int tamTela) {
   // Atualiza parametros dos corpos
   std::vector<Corpo *> *c = this->lista->get_corpos();
@@ -473,6 +487,8 @@ int Fisica::update(float deltaT, int tamTela) {
   return 0;
 }
 
+// Funcao para quando eh dado um impulso em um corpo, que pode fazer ele entrar ou sair da orbita, caso esteja em um hexagono,
+// ou pular algumas posicoes,caso nao esteja em nenhum hexagono
 void Fisica::impulso() {
 
   std::vector<Corpo *> *c = this->lista->get_corpos();
@@ -536,13 +552,13 @@ void Fisica::impulso() {
     ((*c)[0])->set_orb(0);
     return;
   }
-  //Se nao estiver orbitando
 
+  //Se nao estiver orbitando
   int hex_number = this->mapa->buscaHex(posX, posY);
   char orbita = this->mapa->orbita(posX, posY, hex_number, *(c->data()));
 
-  // Se estiver fora de um hexagono
-  if(orbita == 0){
+  // Se estiver fora de um hexagono e longe das bordas do mapa
+  if(orbita == 0 && posX > 5 && posX < 45 && posY > 5 && posY < 195){
     float velX =  ((*c)[0])->get_velX();
     float velY =  ((*c)[0])->get_velY();
     //Avanca vel/4 posicoes
@@ -555,12 +571,12 @@ void Fisica::impulso() {
   (*c)[0]->set_rot(rotacao);
 }
 
-
+// Classe Tela
 
 Tela::Tela(ListaDeCorpos *ldc, int maxI, int maxJ, float maxX, float maxY, Mapa* mapa) {
   this->lista = ldc;
   this->lista_anterior = new ListaDeCorpos();
-  this->lista_anterior->hard_copy(this->lista);
+  this->lista_anterior->copy(this->lista);
   this->maxI = maxI;
   this->maxJ = maxJ;
   this->maxX = maxX;
@@ -568,23 +584,24 @@ Tela::Tela(ListaDeCorpos *ldc, int maxI, int maxJ, float maxX, float maxY, Mapa*
   this->mapa = mapa;
 }
 
+// Criando a tela, escolhendo cores e criando o mapa inicial
 void Tela::init() {
   initscr();			       /* Start curses mode 		*/
 	raw();				         /* Line buffering disabled	*/
   curs_set(0);           /* Do not display cursor */
 
-
+  // Escolhendo indice das cores dos corpos
   start_color();
   init_pair(0, COLOR_WHITE, COLOR_BLACK);
-  init_pair(1, COLOR_BLUE, COLOR_WHITE);
-  init_pair(2, COLOR_GREEN, COLOR_WHITE);
+  init_pair(1, COLOR_WHITE, COLOR_BLUE);
+  init_pair(2, COLOR_WHITE, COLOR_GREEN);
 
+  // Tamanho do mapa
   this->row = 50;
   this->col = 200;
 
   // Limpando a tela
   erase();
-
 
   // Imprimindo bordas
   int i;
@@ -642,13 +659,14 @@ int Tela::getCols(){
   return this->col;
 }
 
+// Funcao que atualiza a tela a cada iteracao, retorna 1 se a tela eh menor do que o necessario e 0 caso contrario
 int Tela::update() {
 
   int x_pos, y_pos;
   getmaxyx(stdscr, this->row, this->col);
 
+  // Se a tela eh pequena demais
   if(this->row < MAX_X || this->col < MAX_Y){
-    // Limpando a tela
     erase();
     move(row/2, col/2);
     printw("Aumente a tela e reinicie o jogo, aperte 'q' para sair");
@@ -673,29 +691,31 @@ int Tela::update() {
     int* hexX = this->mapa->get_listaX();
     int* hexY = this->mapa->get_listaY();
 
-    //Centro do hexagono
-    move(hexX[hex],hexY[hex]);
-    echochar('0');
+    if (abs(hexX[hex]-x_pos) < 9 && abs(hexY[hex]-y_pos) < 9) {
+      //Centro do hexagono
+      move(hexX[hex],hexY[hex]);
+      echochar('0');
 
-    // Lados inclinados
-    int j;
-    for (j=0;j<4;j++) {
-      move(hexX[hex]-j,hexY[hex]-8+j);
-      echochar('/');
-      move(hexX[hex]-j,hexY[hex]+8-j);
-      echochar('\\');
-      move(hexX[hex]+1+j,hexY[hex]-8+j);
-      echochar('\\');
-      move(hexX[hex]+1+j,hexY[hex]+8-j);
-      echochar('/');
-    }
+      // Lados inclinados
+      int j;
+      for (j=0;j<4;j++) {
+        move(hexX[hex]-j,hexY[hex]-8+j);
+        echochar('/');
+        move(hexX[hex]-j,hexY[hex]+8-j);
+        echochar('\\');
+        move(hexX[hex]+1+j,hexY[hex]-8+j);
+        echochar('\\');
+        move(hexX[hex]+1+j,hexY[hex]+8-j);
+        echochar('/');
+      }
 
-    // Lados retos
-    for(j=0;j<9;j++) {
-      move(hexX[hex]-4,hexY[hex]-4+j);
-      echochar('_');
-      move(hexX[hex]+4,hexY[hex]-4+j);
-      echochar('_');
+      // Lados retos
+      for(j=0;j<9;j++) {
+        move(hexX[hex]-4,hexY[hex]-4+j);
+        echochar('_');
+        move(hexX[hex]+4,hexY[hex]-4+j);
+        echochar('_');
+      }
     }
   }
 
@@ -720,7 +740,11 @@ int Tela::update() {
     }
 
     // Atualiza corpos antigos
-    (*corpos_old)[k]->update((*corpos)[k]->get_velX(), (*corpos)[k]->get_velY(), (*corpos)[k]->get_posX(), (*corpos)[k]->get_posY());
+    if (corpos->size() == corpos_old->size()) { // Se nao tem corpos novos
+      (*corpos_old)[k]->update((*corpos)[k]->get_velX(), (*corpos)[k]->get_velY(), (*corpos)[k]->get_posX(), (*corpos)[k]->get_posY());
+    } else { // Se tem corpos novos
+      this->lista_anterior->copy(this->lista);
+    }
   }
 
   // Atualiza tela
@@ -737,7 +761,7 @@ Tela::~Tela() {
 }
 
 
-
+// Funcao que roda em uma segunda thread para capturar o teclado
 void threadfun (char *keybuffer, int *control)
 {
   char c;
@@ -750,12 +774,15 @@ void threadfun (char *keybuffer, int *control)
   return;
 }
 
+// Classe Teclado
+
 Teclado::Teclado() {
 }
 
 Teclado::~Teclado() {
 }
 
+// Iniciando a leitura do teclado
 void Teclado::init() {
   // Inicializa ncurses
   raw();				         /* Line buffering disabled	*/
@@ -773,6 +800,7 @@ void Teclado::stop() {
   (this->kb_thread).join();
 }
 
+// Funcao que le um caracter
 char Teclado::getchar() {
   char c = this->ultima_captura;
   this->ultima_captura = 0;

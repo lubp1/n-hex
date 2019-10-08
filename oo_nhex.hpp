@@ -9,16 +9,17 @@
 #define  MIN_X 2
 
 
+// Classe de corpos. Cada corpo possui sua velocidade e posicao nos eixos X e Y, alem de atributos de sua rotacao e cor
 class Corpo {
   private:
   float velY;
   float velX;
   float posY;
   float posX;
-  char orb;
-  char rot;
-  int pos_orb;
-  char cor;
+  char orb; // Em qual nivel de orbita em torno do hexagono o corpo esta, entre 0 (nao em orbita) e de 1 a 4 (da orbita mais interna a mais externa, respectivamente)
+  char rot; // O sentido da rotacao do corpo
+  int pos_orb; // Posicao do corpo no vetor de orbitas
+  char cor; // Cor do corpo, 0 eh um corpo neutro, 1 da cor do usuario e 2 inimigo
 
   public:
   Corpo();
@@ -34,26 +35,30 @@ class Corpo {
   char get_rot();
   void set_cor(char cor);
   char get_cor();
-  int get_pos_orb();
   void set_pos_orb(int pos_orb);
+  int get_pos_orb();
 };
 
+// Lista com todos os corpos do programa
 class ListaDeCorpos {
  private:
     std::vector<Corpo*> *corpos;
 
   public:
     ListaDeCorpos();
-    void hard_copy(ListaDeCorpos *ldc);
+    void copy(ListaDeCorpos *ldc);
     void add_corpo(Corpo *c);
     std::vector<Corpo*> *get_corpos();
 };
 
+// Mapa do jogo, com a posicao dos hexagonos e suas orbitas
 class Mapa {
   private:
+  // Listas das posicoes dos centros dos hexagonos, em X e Y
   int* listaX_Hex;
   int* listaY_Hex;
 
+  // Listas das posicoes em X e Y das bordas, em relacao ao centro do hexagono (referencia do sistema)
   int *orb1X, *orb1Y;
   int *orb2X, *orb2Y;
   int *orb3X, *orb3Y;
@@ -77,6 +82,7 @@ class Mapa {
   ~Mapa();
 };
 
+// Classe que controla a atualizacao das posicoes dos corpos, e as interacoes entre eles
 class Fisica {
   private:
     ListaDeCorpos *lista;
@@ -90,6 +96,7 @@ class Fisica {
     int update(float deltaT, int tamTela);
 };
 
+// Classe que imprime o mapa e corpos na tela
 class Tela {
   private:
     ListaDeCorpos *lista, *lista_anterior;
@@ -109,8 +116,10 @@ class Tela {
     int getCols(void);
 };
 
+// Funcao que roda em outra thread para ler o teclado
 void threadfun (char *keybuffer, int *control);
 
+// Classe que le do teclado
 class Teclado {
   private:
     char ultima_captura;
