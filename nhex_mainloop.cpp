@@ -84,7 +84,7 @@ int main (){
       }
       l->add_corpo(c1);
     }
-    */ 
+    */
 
     // Atualiza timers
     t0 = t1;
@@ -113,7 +113,7 @@ int main (){
     // Condicao de parada
     if ( (t1-T) > 1000000 ) break;
 
-    std::this_thread::sleep_for (std::chrono::milliseconds(50));
+    std::this_thread::sleep_for (std::chrono::milliseconds(10));
     i++;
   }
   tela->stop();

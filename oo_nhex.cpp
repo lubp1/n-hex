@@ -351,23 +351,12 @@ int Fisica::update(float deltaT, int tamTela) {
       if(((*c)[i])->get_posX() <= MIN_X || ((*c)[i])->get_posX() >= MAX_X){
         new_velX =  (-1)*((*c)[i])->get_velX();
       }
-      else{
-        new_velX = ((*c)[i])->get_velX();
-      }
       if(((*c)[i])->get_posY() <= MIN_Y || ((*c)[i])->get_posY() >= MAX_Y){
         new_velY =  (-1)*((*c)[i])->get_velY();
       }
-      else{
-        new_velY = ((*c)[i])->get_velY();
-      }
 
 
-      for (int j = 0; j < (*c).size(); j++) {
-        if(i != j && (*c)[i]->get_posX() == (*c)[j]->get_posX() && (*c)[i]->get_posY() == (*c)[j]->get_posY()) {
-          (*c)[i]->update(-(*c)[i]->get_velX(), -(*c)[i]->get_velY(), (*c)[i]->get_posX(),  (*c)[i]->get_posY());
-          (*c)[j]->update(-(*c)[j]->get_velX(), -(*c)[j]->get_velY(), (*c)[j]->get_posX(),  (*c)[j]->get_posY());
-        }
-      }
+    
 
       new_posX = (*c)[i]->get_posX() + (int)deltaT * new_velX/1000;
       new_posY = (*c)[i]->get_posY() + (int)deltaT * new_velY/1000;
