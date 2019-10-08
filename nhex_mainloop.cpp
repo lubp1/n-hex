@@ -28,14 +28,7 @@ int main (){
   c7->set_cor(2);
 
 
-  // #define RAND_MAX 10
-  // Corpo **c = (Corpo **)malloc(100 * sizeof(Corpo *));
-  // ListaDeCorpos *l = new ListaDeCorpos();
 
-  // for(int i=0; i<100; i++){
-  //   Corpo *c[i] = {new Corpo(rand()-10, rand()-10, rand(), rand())};
-  //   l->add_corpo( c[i]);
-  // }
   ListaDeCorpos *l = new ListaDeCorpos();
 
   l->add_corpo(c1);
@@ -74,11 +67,12 @@ int main (){
 
     // Atualiza modelo
     if (f->update(deltaT, tela->getRows())) {
+      printf("Sobreviveu por %lu segundos", (get_now_ms()-T)/1000);
       break;
     }
 
     // Atualiza tela
-    tela->update();
+    int tela_pequena = tela->update();
 
     // Lê o teclado
     char c = teclado->getchar();
@@ -87,6 +81,9 @@ int main (){
       f->impulso();
     }
     else if (c=='q' || c=='Q') {
+      if (!tela_pequena) { // Se a tela nao era pequena demais
+        printf("Sobreviveu por %lu segundos", (get_now_ms()-T)/1000);
+      }
       break;
     }
 
@@ -96,8 +93,8 @@ int main (){
     std::this_thread::sleep_for (std::chrono::milliseconds(100));
     i++;
   }
-
   tela->stop();
   teclado->stop();
+
   return 0;
 }

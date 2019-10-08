@@ -104,7 +104,7 @@ class Tela {
     ~Tela();
     void stop();
     void init();
-    void update();
+    int update();
     int getRows(void);
     int getCols(void);
 };

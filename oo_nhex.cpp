@@ -642,14 +642,18 @@ int Tela::getCols(){
   return this->col;
 }
 
-void Tela::update() {
+int Tela::update() {
 
   int x_pos, y_pos;
   getmaxyx(stdscr, this->row, this->col);
 
   if(this->row < MAX_X || this->col < MAX_Y){
+    // Limpando a tela
+    erase();
     move(row/2, col/2);
-    printw("Aumente a tela e reinicie o jogo");
+    printw("Aumente a tela e reinicie o jogo, aperte 'q' para sair");
+    std::this_thread::sleep_for (std::chrono::seconds(1));
+    return 1;
   }
 
   std::vector<Corpo *> *corpos_old = this->lista_anterior->get_corpos();
@@ -721,6 +725,7 @@ void Tela::update() {
 
   // Atualiza tela
   refresh();
+  return 0;
 }
 
 void Tela::stop() {
