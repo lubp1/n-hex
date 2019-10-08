@@ -88,11 +88,12 @@ int main (){
       l->add_corpo(c1);
     }
 
-
+    
     // Atualiza timers
     t0 = t1;
     t1 = get_now_ms();
     deltaT = t1-t0;
+  
 
     // Atualiza modelo
     if (f->update(deltaT, tela->getRows())) {
@@ -115,7 +116,7 @@ int main (){
     // Condicao de parada
     if ( (t1-T) > 1000000 ) break;
 
-    std::this_thread::sleep_for (std::chrono::milliseconds(100));
+    std::this_thread::sleep_for (std::chrono::milliseconds(50));
     i++;
   }
   tela->stop();
