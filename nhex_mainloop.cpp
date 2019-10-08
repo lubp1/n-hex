@@ -14,7 +14,6 @@ int main (){
   Mapa* mapa = new Mapa();
 
   Corpo *c1 = new Corpo(-10, -10, 15, 100); //nave
-  /*
   Corpo *c2 = new Corpo(0, 10, 15, 30);
   Corpo *c3 = new Corpo(10, 10, 10, 40);
   Corpo *c4 = new Corpo(10, 0, 10, 20);
@@ -30,14 +29,12 @@ int main (){
   c5->set_cor(2);
   c6->set_cor(2);
   c7->set_cor(2);
-  */
 
   ListaDeCorpos *l = new ListaDeCorpos();
 
 
 
   l->add_corpo(c1);
-  /*
   l->add_corpo(c2);
   l->add_corpo(c3);
   l->add_corpo(c4);
@@ -48,7 +45,6 @@ int main (){
   l->add_corpo(c9);
   l->add_corpo(c10);
   l->add_corpo(c11);
-  */
 
   Fisica *f = new Fisica(l, mapa);
 
@@ -75,7 +71,8 @@ int main (){
   while (1) {
     spawn++;
     // Spawn de um corpo
-    if (spawn == 20) {
+    /*
+    if (l->get_corpos()->size() < 20 && spawn == 20) {
       spawn = 0;
       spawn_inimigo++;
 
@@ -87,13 +84,13 @@ int main (){
       }
       l->add_corpo(c1);
     }
+    */ 
 
-    
     // Atualiza timers
     t0 = t1;
     t1 = get_now_ms();
     deltaT = t1-t0;
-  
+
 
     // Atualiza modelo
     if (f->update(deltaT, tela->getRows())) {

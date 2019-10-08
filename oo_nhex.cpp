@@ -54,7 +54,6 @@ char Corpo::get_rot(){
 void Corpo::set_cor(char cor){
   this->cor = cor;
 }
-
 char Corpo::get_cor(){
   return this->cor;
 }
