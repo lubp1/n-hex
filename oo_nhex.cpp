@@ -433,7 +433,18 @@ int Fisica::update(float deltaT, int tamTela) {
                   this->mapa->get_orb4Y()[((*c)[i])->get_pos_orb()];
     }
 
-
+    if(new_posX == 1) {
+      new_posX++;
+    }
+    else if(new_posX == 50) {
+      new_posX--;
+    }
+    if(new_posY == 1) {
+      new_posY++;
+    }
+    else if(new_posY == 200) {
+      new_posY--;
+    }
     (*c)[i]->update(new_velX, new_velY, new_posX,  new_posY);
 
   }
@@ -721,7 +732,7 @@ int Tela::update() {
     } else { // Outros corpos
       move(x_pos, y_pos);
       attron(COLOR_PAIR((*corpos)[k]->get_cor()));
-      echochar('o');  
+      echochar('o');
       attroff(COLOR_PAIR((*corpos)[k]->get_cor()));
     }
 

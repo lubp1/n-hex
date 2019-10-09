@@ -26,8 +26,13 @@ int main (){
   Corpo *c11 = new Corpo(10, 10, rand()%45, rand()%190);
   Corpo *c12 = new Corpo(-10, 10, rand()%45, rand()%190);
   Corpo *c13 = new Corpo(10, -10, rand()%45, rand()%190);
-  Corpo *c14 = new Corpo(10, 10, rand()%45, rand()%190);  // Bola branca
+  Corpo *c14 = new Corpo(-10, 10, rand()%45, rand()%190);
 
+  // O jogador comeca orbitando
+  c1->set_orb(4);
+  c1->set_rot('a');
+
+  // Bolas inimigas
   c2->set_cor(2);
   c3->set_cor(2);
   c4->set_cor(2);
@@ -38,8 +43,6 @@ int main (){
   c9->set_cor(2);
   c10->set_cor(2);
   c11->set_cor(2);
-  c12->set_cor(2);
-  c13->set_cor(2);
 
   ListaDeCorpos *l = new ListaDeCorpos();
 
@@ -78,6 +81,7 @@ int main (){
   T = get_now_ms();
   t1 = T;
   int tela_pequena = 0; // Marca se a tela eh menor que o suportado pelo jogo
+  int ganhou = 0;
 
   while (1) {
 
@@ -108,9 +112,8 @@ int main (){
 
     // Condicao de parada
     if ( (t1-T) > 1000000 ) break;
-    if (c14->get_cor() == 1){
-      printf("\n          PARABENS VOCE GANHOU!\n");
-      std::this_thread::sleep_for (std::chrono::milliseconds(2000));
+    if (c12->get_cor() == 1 || c13->get_cor() == 1 || c14->get_cor() == 1){
+      ganhou = 1;
       break;
     }
 
@@ -120,7 +123,10 @@ int main (){
   tela->stop();
   teclado->stop();
 
-  if(!tela_pequena) {
+  if(ganhou) {
+    printf("Você ganhou o jogo em %lu segundos\n", (get_now_ms()-T)/1000);
+  }
+  else if(!tela_pequena) {
     printf("Sobreviveu por %lu segundos\n", (get_now_ms()-T)/1000);
   }
 
