@@ -356,8 +356,6 @@ int Fisica::update(float deltaT, int tamTela) {
       }
 
 
-    
-
       new_posX = (*c)[i]->get_posX() + (int)deltaT * new_velX/1000;
       new_posY = (*c)[i]->get_posY() + (int)deltaT * new_velY/1000;
     }
@@ -546,7 +544,7 @@ void Fisica::impulso() {
   char orbita = this->mapa->orbita(posX, posY, hex_number, *(c->data()));
 
   // Se estiver fora de um hexagono e longe das bordas do mapa
-  if(orbita == 0 && posX > 5 && posX < 45 && posY > 5 && posY < 195){
+  if(posX > 5 && posX < 45 && posY > 5 && posY < 195){
     float velX =  ((*c)[0])->get_velX();
     float velY =  ((*c)[0])->get_velY();
     //Avanca vel/4 posicoes
@@ -715,15 +713,15 @@ int Tela::update() {
     x_pos = (int) ((*corpos)[k]->get_posX());
     y_pos = (int) ((*corpos)[k]->get_posY());
 
-    if (!k) {
-      move(x_pos, y_pos);   /* Move cursor to position */
+    if (!k) { // O jogador
+      move(x_pos, y_pos);
       attron(COLOR_PAIR(1));
-      echochar('*');  /* Prints character, advances a position */
+      echochar('*');
       attroff(COLOR_PAIR(1));
-    } else {
-      move(x_pos, y_pos);   /* Move cursor to position */
+    } else { // Outros corpos
+      move(x_pos, y_pos);
       attron(COLOR_PAIR((*corpos)[k]->get_cor()));
-      echochar('o');  /* Prints character, advances a position */
+      echochar('o');  
       attroff(COLOR_PAIR((*corpos)[k]->get_cor()));
     }
 
