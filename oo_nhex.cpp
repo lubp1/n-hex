@@ -611,7 +611,7 @@ void Tela::init() {
 
     //Centro do hexagono
     move(hexX[i],hexY[i]);
-    echochar('0');
+    echochar('.');
 
     // Lados inclinados
     int j;
@@ -680,7 +680,7 @@ int Tela::update() {
     if (abs(hexX[hex]-x_pos) < 9 && abs(hexY[hex]-y_pos) < 9) {
       //Centro do hexagono
       move(hexX[hex],hexY[hex]);
-      echochar('0');
+      echochar('.');
 
       // Lados inclinados
       int j;

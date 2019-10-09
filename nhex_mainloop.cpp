@@ -13,7 +13,7 @@ uint64_t get_now_ms() {
 int main (){
   Mapa* mapa = new Mapa();
 
-  Corpo *c1 = new Corpo(-10, -10, 15, 100); //nave
+  Corpo *c1 = new Corpo(0, -10, 15, 100); //nave
   Corpo *c2 = new Corpo(0, 10, rand()%45, rand()%190);
   Corpo *c3 = new Corpo(10, 10, rand()%45, rand()%190);
   Corpo *c4 = new Corpo(10, 0, rand()%45, rand()%190);
@@ -24,8 +24,11 @@ int main (){
   Corpo *c9 = new Corpo(10, 10, rand()%45, rand()%190);
   Corpo *c10 = new Corpo(10, 10, rand()%45, rand()%190);
   Corpo *c11 = new Corpo(10, 10, rand()%45, rand()%190);
+  Corpo *c12 = new Corpo(-10, 10, rand()%45, rand()%190);
+  Corpo *c13 = new Corpo(10, -10, rand()%45, rand()%190);
+  Corpo *c14 = new Corpo(10, 10, rand()%45, rand()%190);  // Bola branca
 
-
+  c2->set_cor(2);
   c3->set_cor(2);
   c4->set_cor(2);
   c5->set_cor(2);
@@ -33,9 +36,12 @@ int main (){
   c7->set_cor(2);
   c8->set_cor(2);
   c9->set_cor(2);
+  c10->set_cor(2);
+  c11->set_cor(2);
+  c12->set_cor(2);
+  c13->set_cor(2);
 
   ListaDeCorpos *l = new ListaDeCorpos();
-
 
   l->add_corpo(c1);
   l->add_corpo(c2);
@@ -48,6 +54,9 @@ int main (){
   l->add_corpo(c9);
   l->add_corpo(c10);
   l->add_corpo(c11);
+  l->add_corpo(c12);
+  l->add_corpo(c13);
+  l->add_corpo(c14);
 
   Fisica *f = new Fisica(l, mapa);
 
@@ -99,6 +108,11 @@ int main (){
 
     // Condicao de parada
     if ( (t1-T) > 1000000 ) break;
+    if (c14->get_cor() == 1){
+      printf("\n          PARABENS VOCE GANHOU!\n");
+      std::this_thread::sleep_for (std::chrono::milliseconds(2000));
+      break;
+    }
 
     std::this_thread::sleep_for (std::chrono::milliseconds(100));
     i++;
