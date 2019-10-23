@@ -121,7 +121,6 @@ int main (){
     i++;
   }
   tela->stop();
-  teclado->stop();
 
   if(ganhou) {
     printf("Você ganhou o jogo em %lu segundos\n", (get_now_ms()-T)/1000);
