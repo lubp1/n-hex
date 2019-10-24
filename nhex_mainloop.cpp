@@ -1,8 +1,3 @@
-#include <iostream>
-#include <chrono>
-#include <thread>
-#include <vector>
-
 #include "oo_nhex.hpp"
 
 using namespace std::chrono;
@@ -67,8 +62,11 @@ int main (){
   Tela *tela = new Tela(l, 20, 20, 20, 20, mapa);
   tela->init();
 
-  Teclado *teclado = new Teclado();
-  teclado->init();
+  Servidor *servidor = new Servidor();
+  servidor->initServer();
+  std::thread newthread(threadfun, (servidor));
+  (servidor->kb_thread).swap(newthread);
+
 
   uint64_t t0;
   uint64_t t1;
@@ -101,7 +99,7 @@ int main (){
     tela_pequena = tela->update();
 
     // Lê o teclado
-    char c = teclado->getchar();
+    char c = servidor->getBuffer();
 
     if (c==' ') {
       f->impulso();
@@ -120,7 +118,8 @@ int main (){
     std::this_thread::sleep_for (std::chrono::milliseconds(100));
     i++;
   }
-  tela->stop();
+
+  servidor->endServer();
 
   if(ganhou) {
     printf("Você ganhou o jogo em %lu segundos\n", (get_now_ms()-T)/1000);

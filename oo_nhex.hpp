@@ -2,7 +2,19 @@
 #ifndef OO_NHEX_HPP
 #define OO_NHEX_HPP
 
+#include <vector>
+#include <chrono>
 #include <thread>
+#include <iostream>
+#include "oo_nhex.hpp"
+#include <cstdlib>
+#include <ncurses.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+
 #define  MAX_Y 200
 #define  MIN_Y 2
 #define  MAX_X 49
@@ -116,5 +128,36 @@ class Tela {
     int getCols(void);
 };
 
+
+class Servidor {
+  private:
+    int socket_fd;
+    int connection_fd;
+    struct sockaddr_in myself;
+    char input_buffer;
+    int rodando;
+
+
+  public:
+    struct sockaddr_in client;
+    socklen_t client_size;
+    std::thread kb_thread;
+
+    Servidor();
+    void initServer();
+    void endServer();
+    void setBuffer(char buffer);
+    char getBuffer();
+    void setRodando(int rodando);
+    int getRodando();
+    void setConnection(int connection);
+    int getConnection();
+    void setSocket(int socket);
+    int getSocket();
+    void setClientSize(socklen_t client_size);
+    socklen_t getClientSize();
+};
+
+void threadfun (Servidor* server);
 
 #endif

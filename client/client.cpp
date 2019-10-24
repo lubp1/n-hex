@@ -8,6 +8,7 @@
 #include "oo_client.hpp"
 #include <chrono>
 #include <thread>
+#include <ncurses.h>
 
 
 using namespace std::chrono;
@@ -17,7 +18,7 @@ int main() {
   int socket_fd;
   struct sockaddr_in target;
 
-
+  initscr();
   Teclado *teclado = new Teclado();
   teclado->init();
 
@@ -38,20 +39,18 @@ int main() {
 
 
       /* Agora, meu socket funciona como um descritor de arquivo usual */
-      if (c == 'q' || c == 'Q') {
-        send(socket_fd, "q", 1, 0);
-        printf("Mandei um q\n");
-      } else if (c == ' ') {
-        send(socket_fd, "l", 1, 0);
-        printf("Mandei um espaco\n");
+      send(socket_fd, &c, 1, 0);
+      if(c == 'q') {
+        break;
       }
 
       close(socket_fd);
 
 
-      std::this_thread::sleep_for (std::chrono::milliseconds(1000));
+      std::this_thread::sleep_for (std::chrono::milliseconds(100));
   }
 
+  endwin();
   teclado->stop();
 
   return 0;

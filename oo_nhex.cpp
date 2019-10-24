@@ -5,6 +5,11 @@
 #include "oo_nhex.hpp"
 #include <cstdlib>
 #include <ncurses.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
 
 using namespace std::chrono;
 
@@ -755,4 +760,76 @@ void Tela::stop() {
 
 Tela::~Tela() {
   this->stop();;
+}
+
+// Funcao que roda em uma segunda thread para ouvir o servidor
+void threadfun (Servidor* server) {
+  char c;
+  while ((server->getRodando()) == 1) {
+    char keybuffer;
+    server->setConnection(accept(server->getSocket(), (struct sockaddr*)&(server->client), &(server->client_size)));
+    recv(server->getConnection(), &keybuffer, 1, 0);
+    server->setBuffer(keybuffer);
+
+    std::this_thread::sleep_for (std::chrono::milliseconds(10));
+  }
+  return;
+}
+
+
+Servidor::Servidor() {
+
+}
+
+void Servidor::initServer() {
+  this->client_size = (socklen_t)sizeof(this->client);
+
+  this->socket_fd = socket(AF_INET, SOCK_STREAM, 0);
+
+  (this->myself).sin_family = AF_INET;
+  (this->myself).sin_port = htons(3001);
+  inet_aton("127.0.0.1", &((this->myself).sin_addr));
+
+
+  if (bind(this->socket_fd, (struct sockaddr*)&(this->myself), sizeof(this->myself)) != 0) {
+    return;
+  }
+
+  listen(this->socket_fd, 2);
+
+
+  this->rodando = 1;
+}
+
+
+void Servidor::endServer() {
+  close(this->socket_fd);
+}
+
+
+
+
+void Servidor::setBuffer(char buffer) {
+  this->input_buffer = buffer;
+}
+char Servidor::getBuffer() {
+  return this->input_buffer;
+}
+void Servidor::setRodando(int rodando) {
+  this->rodando = rodando;
+}
+int Servidor::getRodando() {
+  return this->rodando;
+}
+void Servidor::setConnection(int connection) {
+  this->connection_fd = connection;
+}
+int Servidor::getConnection() {
+  return this->connection_fd;
+}
+void Servidor::setSocket(int socket) {
+  this->socket_fd = socket;
+}
+int Servidor::getSocket() {
+  return this->socket_fd;
 }
