@@ -22,36 +22,38 @@ int main() {
   Teclado *teclado = new Teclado();
   teclado->init();
 
+  socket_fd = socket(AF_INET, SOCK_STREAM, 0);
+   
+  target.sin_family = AF_INET;
+  target.sin_port = htons(3001);
+  inet_aton("192.168.0.48", &(target.sin_addr));
+  if (connect(socket_fd, (struct sockaddr*)&target, sizeof(target)) != 0) {
+    return 0;
+  }
 
 
     while (1) {
-      socket_fd = socket(AF_INET, SOCK_STREAM, 0);
-
-
-      target.sin_family = AF_INET;
-      target.sin_port = htons(3001);
-      inet_aton("128.168.43.204", &(target.sin_addr));
-      if (connect(socket_fd, (struct sockaddr*)&target, sizeof(target)) != 0) {
-        return 0;
-      }
+     
       // Lê o teclado
       char c = teclado->getchar();
 
-
-      /* Agora, meu socket funciona como um descritor de arquivo usual */
-      send(socket_fd, &c, 1, 0);
-      if(c == 'q') {
-        break;
+      if(c == ' ' || c == 'q'){
+        printf("TESTE\n");
+        /* Agora, meu socket funciona como um descritor de arquivo usual */
+        send(socket_fd, &c, 1, 0);
+        send(socket_fd, 0, 1, 0);
+        if(c == 'q') {
+          break;
+        }
       }
-
-      close(socket_fd);
-
 
       std::this_thread::sleep_for (std::chrono::milliseconds(100));
   }
 
-  teclado->stop();
+  close(socket_fd);
+
   endwin();
+  teclado->stop();
 
   return 0;
 }
