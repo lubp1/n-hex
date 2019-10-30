@@ -6,9 +6,9 @@ uint64_t get_now_ms() {
 }
 
 int main (){
-  // Atualiza seed 
+  // Atualiza seed
   srand(get_now_ms());
-  
+
   Mapa* mapa = new Mapa();
 
   Corpo *c1 = new Corpo(0, -10, 15, 100); //nave
@@ -123,6 +123,8 @@ int main (){
   }
 
   servidor->endServer();
+  tela->stop();
+
 
   if(ganhou) {
     printf("Você ganhou o jogo em %lu segundos\n", (get_now_ms()-T)/1000);

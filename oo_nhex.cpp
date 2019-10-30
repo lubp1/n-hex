@@ -767,9 +767,11 @@ void threadfun (Servidor* server) {
   char c;
   while ((server->getRodando()) == 1) {
     char keybuffer;
-    server->setConnection(accept(server->getSocket(), (struct sockaddr*)&(server->client), &(server->client_size)));
-    recv(server->getConnection(), &keybuffer, 1, 0);
-    server->setBuffer(keybuffer);
+    if (recv(server->getConnection(), &keybuffer, 1, 0) == 1) {
+      server->setBuffer(keybuffer);
+    } else {
+      server->setBuffer(0);
+    }
 
     std::this_thread::sleep_for (std::chrono::milliseconds(10));
   }
@@ -788,7 +790,7 @@ void Servidor::initServer() {
 
   (this->myself).sin_family = AF_INET;
   (this->myself).sin_port = htons(3001);
-  inet_aton("127.0.0.1", &((this->myself).sin_addr));
+  inet_aton("192.168.0.48", &((this->myself).sin_addr));
 
 
   if (bind(this->socket_fd, (struct sockaddr*)&(this->myself), sizeof(this->myself)) != 0) {
@@ -796,6 +798,7 @@ void Servidor::initServer() {
   }
 
   listen(this->socket_fd, 2);
+  this->setConnection(accept(this->getSocket(), (struct sockaddr*)&(this->client), &(this->client_size)));
 
 
   this->rodando = 1;
@@ -813,7 +816,9 @@ void Servidor::setBuffer(char buffer) {
   this->input_buffer = buffer;
 }
 char Servidor::getBuffer() {
-  return this->input_buffer;
+  char c = this->input_buffer;
+  this->input_buffer = 0;
+  return c;
 }
 void Servidor::setRodando(int rodando) {
   this->rodando = rodando;
