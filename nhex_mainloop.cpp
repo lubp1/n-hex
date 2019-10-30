@@ -6,6 +6,9 @@ uint64_t get_now_ms() {
 }
 
 int main (){
+  // Atualiza seed 
+  srand(get_now_ms());
+  
   Mapa* mapa = new Mapa();
 
   Corpo *c1 = new Corpo(0, -10, 15, 100); //nave

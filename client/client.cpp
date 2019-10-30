@@ -30,7 +30,7 @@ int main() {
 
       target.sin_family = AF_INET;
       target.sin_port = htons(3001);
-      inet_aton("127.0.0.1", &(target.sin_addr));
+      inet_aton("128.168.43.204", &(target.sin_addr));
       if (connect(socket_fd, (struct sockaddr*)&target, sizeof(target)) != 0) {
         return 0;
       }
