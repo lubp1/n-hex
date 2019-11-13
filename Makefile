@@ -7,10 +7,10 @@ cliente: client/client.cpp client/oo_client.cpp
 
 
 debug:
-	g++ -onhex nhex_mainloop.cpp oo_nhex.cpp $(FLAGS) -g
+	g++ -oservidor server/server.cpp server/oo_server.cpp $(FLAGS) -g
 
-nhex: nhex_mainloop.cpp oo_nhex.cpp oo_nhex.hpp
-	g++ -onhex nhex_mainloop.cpp oo_nhex.cpp $(FLAGS)
+servidor: server/server.cpp server/oo_server.cpp server/oo_server.hpp
+	g++ -oservidor server/server.cpp server/oo_server.cpp $(FLAGS)
 
 clear:
 	rm nhex

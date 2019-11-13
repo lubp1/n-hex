@@ -12,47 +12,65 @@
 
 
 using namespace std::chrono;
-
+uint64_t get_now_ms() {
+  return duration_cast<milliseconds>(steady_clock::now().time_since_epoch()).count();
+}
 
 int main() {
-  int socket_fd;
-  struct sockaddr_in target;
 
-  initscr();
+
   Teclado *teclado = new Teclado();
   teclado->init();
 
-  socket_fd = socket(AF_INET, SOCK_STREAM, 0);
-   
-  target.sin_family = AF_INET;
-  target.sin_port = htons(3001);
-  inet_aton("192.168.0.48", &(target.sin_addr));
-  if (connect(socket_fd, (struct sockaddr*)&target, sizeof(target)) != 0) {
-    return 0;
-  }
+  Mapa* mapa = new Mapa();
+  ListaDeCorpos *l = new ListaDeCorpos();
 
+  Tela *tela = new Tela(l, 20, 20, 20, 20, mapa);
+  tela->init();
 
-    while (1) {
-     
-      // Lê o teclado
-      char c = teclado->getchar();
+  Cliente *client = new Cliente();
+  client->initClient();
 
-      if(c == ' ' || c == 'q'){
-        printf("TESTE\n");
-        /* Agora, meu socket funciona como um descritor de arquivo usual */
-        send(socket_fd, &c, 1, 0);
-        send(socket_fd, 0, 1, 0);
-        if(c == 'q') {
-          break;
-        }
+  uint64_t t0;
+  uint64_t t1;
+  uint64_t deltaT;
+  uint64_t T;
+  uint64_t ts0, ts1;
+
+  int i = 0;
+
+  T = get_now_ms();
+  t1 = T;
+  int tela_pequena = 0; // Marca se a tela eh menor que o suportado pelo jogo
+  int ganhou = 0;
+
+  while (1) {
+      
+    if(c == ' ' || c == 'q'){
+      printf("TESTE\n");
+      /* Agora, meu socket funciona como um descritor de arquivo usual */
+      send(socket_fd, &c, 1, 0);
+      send(socket_fd, 0, 1, 0);
+      if(c == 'q') {
+        break;
       }
+    }
 
-      std::this_thread::sleep_for (std::chrono::milliseconds(100));
+    std::this_thread::sleep_for (std::chrono::milliseconds(100));
   }
 
-  close(socket_fd);
+  client->endClient();
+  tela->stop();
 
-  endwin();
+
+  if(ganhou) {
+    printf("Você ganhou o jogo em %lu segundos\n", (get_now_ms()-T)/1000);
+  }
+  else if(!tela_pequena) {
+    printf("Sobreviveu por %lu segundos\n", (get_now_ms()-T)/1000);
+  }
+
+  return 0;
   teclado->stop();
 
   return 0;
