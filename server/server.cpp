@@ -13,6 +13,7 @@ int main (){
   Mapa* mapa = new Mapa();
 
   Corpo *c1 = new Corpo(0, -10, 15, 100); //nave
+  Corpo *c2 = new Corpo(10, -10, rand()%45, rand()%190);
   Corpo *c3 = new Corpo(10, 10, rand()%45, rand()%190);
   Corpo *c4 = new Corpo(10, 0, rand()%45, rand()%190);
   Corpo *c5 = new Corpo(-10, 10, rand()%45, rand()%190);
@@ -30,13 +31,7 @@ int main (){
   c1->set_orb(4);
   c1->set_rot('a');
 
-  std::string s = c1->serialize();
-  std::cout<<s;
-  Corpo *c2 = new Corpo();
-  c2->unserialize(s);
-  s = c2->serialize();
-  std::cout<<s;
-  return 0;
+  
   // Bolas inimigas
   //c2->set_cor(2);
   c3->set_cor(2);
@@ -65,7 +60,11 @@ int main (){
   l->add_corpo(c12);
   l->add_corpo(c13);
   l->add_corpo(c14);
-
+  
+  std::string s = l->serialize();
+  std::cout<<s;
+  return 0;
+  
 
   Fisica *f = new Fisica(l, mapa);
 

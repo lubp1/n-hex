@@ -64,6 +64,8 @@ class ListaDeCorpos {
     void copy(ListaDeCorpos *ldc);
     void add_corpo(Corpo *c);
     std::vector<Corpo*> *get_corpos();
+    std::string serialize();
+    void unserialize(std::string lista_serializado);
 };
 
 // Mapa do jogo, com a posicao dos hexagonos e suas orbitas

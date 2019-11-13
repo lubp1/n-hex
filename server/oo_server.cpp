@@ -127,7 +127,21 @@ void ListaDeCorpos::add_corpo(Corpo *c) {
 std::vector<Corpo*> *ListaDeCorpos::get_corpos() {
   return (this->corpos);
 }
-
+std::string ListaDeCorpos::serialize() {
+  json j;
+  int i;
+  for(i=0;i<corpos->size();i++) {
+    j[i] = corpos->at(i)->serialize();
+  }
+  return j.dump();
+}
+void ListaDeCorpos::unserialize(std::string lista_serializada) {
+  json j;
+  j = json::parse(lista_serializada);
+  for(int i = 0; i<corpos->size(); i++) {
+    corpos->at(i)->unserialize(j.at(i));
+  }
+}
 
 
 // Classe Mapa
