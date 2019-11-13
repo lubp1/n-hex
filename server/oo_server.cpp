@@ -2,13 +2,23 @@
 #include <chrono>
 #include <thread>
 #include <iostream>
-#include "oo_nhex.hpp"
+#include "oo_server.hpp"
 #include <cstdlib>
 #include <ncurses.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
 
 using namespace std::chrono;
+using json = nlohmann::json;
 
 // Classe corpo
+
+Corpo::Corpo() {
+}
+
 
 Corpo::Corpo(float vX, float vY, float posX, float posY) {
   this->velX = vX;
@@ -39,22 +49,22 @@ float Corpo::get_posY() {
 float Corpo::get_posX() {
   return this->posX;
 }
-void Corpo::set_orb(char orb){
+void Corpo::set_orb(int orb){
   this->orb = orb;
 }
-char Corpo::get_orb(){
+int Corpo::get_orb(){
   return this->orb;
 }
-void Corpo::set_rot(char rot){
+void Corpo::set_rot(int rot){
   this->rot = rot;
 }
-char Corpo::get_rot(){
+int Corpo::get_rot(){
   return this->rot;
 }
-void Corpo::set_cor(char cor){
+void Corpo::set_cor(int cor){
   this->cor = cor;
 }
-char Corpo::get_cor(){
+int Corpo::get_cor(){
   return this->cor;
 }
 int Corpo::get_pos_orb(){
@@ -63,7 +73,33 @@ int Corpo::get_pos_orb(){
 void Corpo::set_pos_orb(int pos_orb){
   this->pos_orb = pos_orb;
 }
+// Funcao para serializar um corpo
+std::string Corpo::serialize(){
+  json j;
+  j["velY"] = this->velY;
+  j["velX"] = this->velX;
+  j["posY"] = this->posY;
+  j["posX"] = this->posX;
+  j["orb"] = this->orb;
+  j["rot"] = this->rot;
+  j["pos_orb"] = this->pos_orb;
+  j["cor"] = this->cor;
 
+  return j.dump();
+}
+
+void Corpo::unserialize(std::string corpo_serializado){
+  json j;
+  j = json::parse(corpo_serializado);
+  this->velY = j.at("velY");
+  this->velX = j.at("velX");
+  this->posY = j.at("posY");
+  this->posX = j.at("posX");
+  this->orb = j.at("orb");
+  this->rot = j.at("rot");
+  this->pos_orb = j.at("pos_orb");
+  this->cor = j.at("cor");
+}
 
 
 // Classe ListaDeCorpos
@@ -757,49 +793,79 @@ Tela::~Tela() {
   this->stop();;
 }
 
-
-// Funcao que roda em uma segunda thread para capturar o teclado
-void threadfun (char *keybuffer, int *control)
-{
+// Funcao que roda em uma segunda thread para ouvir os clientes
+void threadfun (Servidor* server) {
   char c;
-  while ((*control) == 1) {
-    c = getch();
-    if (c!=ERR) (*keybuffer) = c;
-    else (*keybuffer) = 0;
+  while ((server->getRodando()) == 1) {
+    char keybuffer;
+    if (recv(server->getConnection(), &keybuffer, 1, 0) == 1) {
+      server->setBuffer(keybuffer);
+    } else {
+      server->setBuffer(0);
+    }
+
     std::this_thread::sleep_for (std::chrono::milliseconds(10));
   }
   return;
 }
 
-// Classe Teclado
 
-Teclado::Teclado() {
+Servidor::Servidor() {
+
 }
 
-Teclado::~Teclado() {
-}
+void Servidor::initServer() {
+  this->client_size = (socklen_t)sizeof(this->client);
 
-// Iniciando a leitura do teclado
-void Teclado::init() {
-  // Inicializa ncurses
-  raw();				         /* Line buffering disabled	*/
-	keypad(stdscr, TRUE);	 /* We get F1, F2 etc..		*/
-	noecho();			         /* Don't echo() while we do getch */
-  curs_set(0);           /* Do not display cursor */
+  this->socket_fd = socket(AF_INET, SOCK_STREAM, 0);
+
+  (this->myself).sin_family = AF_INET;
+  (this->myself).sin_port = htons(3001);
+  inet_aton("192.168.0.48", &((this->myself).sin_addr));
+
+
+  if (bind(this->socket_fd, (struct sockaddr*)&(this->myself), sizeof(this->myself)) != 0) {
+    return;
+  }
+
+  listen(this->socket_fd, 2);
+  this->setConnection(accept(this->getSocket(), (struct sockaddr*)&(this->client), &(this->client_size)));
+
 
   this->rodando = 1;
-  std::thread newthread(threadfun, &(this->ultima_captura), &(this->rodando));
-  (this->kb_thread).swap(newthread);
 }
 
-void Teclado::stop() {
-  this->rodando = 0;
-  (this->kb_thread).join();
+
+void Servidor::endServer() {
+  close(this->socket_fd);
 }
 
-// Funcao que le um caracter
-char Teclado::getchar() {
-  char c = this->ultima_captura;
-  this->ultima_captura = 0;
+
+
+
+void Servidor::setBuffer(char buffer) {
+  this->input_buffer = buffer;
+}
+char Servidor::getBuffer() {
+  char c = this->input_buffer;
+  this->input_buffer = 0;
   return c;
+}
+void Servidor::setRodando(int rodando) {
+  this->rodando = rodando;
+}
+int Servidor::getRodando() {
+  return this->rodando;
+}
+void Servidor::setConnection(int connection) {
+  this->connection_fd = connection;
+}
+int Servidor::getConnection() {
+  return this->connection_fd;
+}
+void Servidor::setSocket(int socket) {
+  this->socket_fd = socket;
+}
+int Servidor::getSocket() {
+  return this->socket_fd;
 }

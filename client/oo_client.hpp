@@ -1,12 +1,42 @@
+#ifndef OO_CLIENT_HPP
+#define OO_CLIENT_HPP
 
-#ifndef OO_NHEX_HPP
-#define OO_NHEX_HPP
-
-#include <thread>
 #define  MAX_Y 200
 #define  MIN_Y 2
 #define  MAX_X 49
 #define  MIN_X 2
+
+#include <vector>
+#include <chrono>
+#include <thread>
+#include <iostream>
+#include <cstdlib>
+#include <ncurses.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+
+
+// Funcao que roda em outra thread para ler o teclado
+void threadfun (char *keybuffer, int *control);
+
+// Classe que le do teclado
+class Teclado {
+  private:
+    char ultima_captura;
+    int rodando;
+
+    std::thread kb_thread;
+
+  public:
+    Teclado();
+    ~Teclado();
+    void stop();
+    void init();
+    char getchar();
+};
 
 
 // Classe de corpos. Cada corpo possui sua velocidade e posicao nos eixos X e Y, alem de atributos de sua rotacao e cor
@@ -82,19 +112,6 @@ class Mapa {
   ~Mapa();
 };
 
-// Classe que controla a atualizacao das posicoes dos corpos, e as interacoes entre eles
-class Fisica {
-  private:
-    ListaDeCorpos *lista;
-    Mapa* mapa;
-
-
-  public:
-    Fisica(ListaDeCorpos *ldc, Mapa* mapa);
-    void add_corpo(Corpo *c);
-    void impulso();
-    int update(float deltaT, int tamTela);
-};
 
 // Classe que imprime o mapa e corpos na tela
 class Tela {
@@ -116,23 +133,34 @@ class Tela {
     int getCols(void);
 };
 
-// Funcao que roda em outra thread para ler o teclado
-void threadfun (char *keybuffer, int *control);
-
-// Classe que le do teclado
-class Teclado {
-  private:
-    char ultima_captura;
+class Cliente {
+    private:
+    int socket_fd;
+    int connection_fd;
+    struct sockaddr_in myself;
+    char input_buffer;
     int rodando;
 
-    std::thread kb_thread;
 
   public:
-    Teclado();
-    ~Teclado();
-    void stop();
-    void init();
-    char getchar();
-};
+    struct sockaddr_in client;
+    socklen_t client_size;
+    std::thread kb_thread;
+
+    Cliente();
+    void initClient();
+    void endClient();
+    void setBuffer(char buffer);
+    char getBuffer();
+    void setRodando(int rodando);
+    int  getRodando();
+    void setConnection(int connection);
+    int  getConnection();
+    void setSocket(int socket);
+    int  getSocket();
+    void setClientSize(socklen_t client_size);
+    socklen_t getClientSize();
+}
+
 
 #endif

@@ -1,20 +1,18 @@
-#include <iostream>
-#include <chrono>
-#include <thread>
-#include <vector>
-
-#include "oo_nhex.hpp"
+#include "oo_server.hpp"
 
 using namespace std::chrono;
+using json = nlohmann::json;
 uint64_t get_now_ms() {
   return duration_cast<milliseconds>(steady_clock::now().time_since_epoch()).count();
 }
 
 int main (){
+  // Atualiza seed
+  srand(get_now_ms());
+
   Mapa* mapa = new Mapa();
 
   Corpo *c1 = new Corpo(0, -10, 15, 100); //nave
-  Corpo *c2 = new Corpo(0, 10, rand()%45, rand()%190);
   Corpo *c3 = new Corpo(10, 10, rand()%45, rand()%190);
   Corpo *c4 = new Corpo(10, 0, rand()%45, rand()%190);
   Corpo *c5 = new Corpo(-10, 10, rand()%45, rand()%190);
@@ -32,8 +30,15 @@ int main (){
   c1->set_orb(4);
   c1->set_rot('a');
 
+  std::string s = c1->serialize();
+  std::cout<<s;
+  Corpo *c2 = new Corpo();
+  c2->unserialize(s);
+  s = c2->serialize();
+  std::cout<<s;
+  return 0;
   // Bolas inimigas
-  c2->set_cor(2);
+  //c2->set_cor(2);
   c3->set_cor(2);
   c4->set_cor(2);
   c5->set_cor(2);
@@ -61,14 +66,18 @@ int main (){
   l->add_corpo(c13);
   l->add_corpo(c14);
 
+
   Fisica *f = new Fisica(l, mapa);
 
 
   Tela *tela = new Tela(l, 20, 20, 20, 20, mapa);
   tela->init();
 
-  Teclado *teclado = new Teclado();
-  teclado->init();
+  Servidor *servidor = new Servidor();
+  servidor->initServer();
+  std::thread newthread(threadfun, (servidor));
+  (servidor->kb_thread).swap(newthread);
+
 
   uint64_t t0;
   uint64_t t1;
@@ -101,7 +110,7 @@ int main (){
     tela_pequena = tela->update();
 
     // Lê o teclado
-    char c = teclado->getchar();
+    char c = servidor->getBuffer();
 
     if (c==' ') {
       f->impulso();
@@ -120,15 +129,4 @@ int main (){
     std::this_thread::sleep_for (std::chrono::milliseconds(100));
     i++;
   }
-  tela->stop();
-  teclado->stop();
-
-  if(ganhou) {
-    printf("Você ganhou o jogo em %lu segundos\n", (get_now_ms()-T)/1000);
-  }
-  else if(!tela_pequena) {
-    printf("Sobreviveu por %lu segundos\n", (get_now_ms()-T)/1000);
-  }
-
-  return 0;
 }
