@@ -17,10 +17,11 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include "../headers/json.hpp"
 
 
 // Funcao que roda em outra thread para ler o teclado
-void threadfun (char *keybuffer, int *control);
+void threadKeyboardfun (char *keybuffer, int *control);
 
 // Classe que le do teclado
 class Teclado {
@@ -46,10 +47,11 @@ class Corpo {
   float velX;
   float posY;
   float posX;
-  char orb; // Em qual nivel de orbita em torno do hexagono o corpo esta, entre 0 (nao em orbita) e de 1 a 4 (da orbita mais interna a mais externa, respectivamente)
-  char rot; // O sentido da rotacao do corpo
+  int orb; // Em qual nivel de orbita em torno do hexagono o corpo esta, entre 0 (nao em orbita) e de 1 a 4 (da orbita mais interna a mais externa, respectivamente)
+  int rot; // O sentido da rotacao do corpo
   int pos_orb; // Posicao do corpo no vetor de orbitas
-  char cor; // Cor do corpo, 0 eh um corpo neutro, 1 da cor do usuario e 2 inimigo
+  int cor; // Cor do corpo, 0 eh um corpo neutro, 1 da cor do usuario e 2 inimigo
+
 
   public:
   Corpo();
@@ -59,14 +61,16 @@ class Corpo {
   float get_velX();
   float get_posY();
   float get_posX();
-  void set_orb(char orb);
-  char get_orb();
-  void set_rot(char rot);
-  char get_rot();
-  void set_cor(char cor);
-  char get_cor();
+  void set_orb(int orb);
+  int get_orb();
+  void set_rot(int rot);
+  int get_rot();
+  void set_cor(int cor);
+  int get_cor();
   void set_pos_orb(int pos_orb);
   int get_pos_orb();
+  std::string serialize();
+  void unserialize(std::string corpo_serializado);
 };
 
 // Lista com todos os corpos do programa
@@ -79,7 +83,10 @@ class ListaDeCorpos {
     void copy(ListaDeCorpos *ldc);
     void add_corpo(Corpo *c);
     std::vector<Corpo*> *get_corpos();
+    std::string serialize();
+    void unserialize(std::string lista_serializado);
 };
+
 
 // Mapa do jogo, com a posicao dos hexagonos e suas orbitas
 class Mapa {
@@ -160,7 +167,7 @@ class Cliente {
     int  getSocket();
     void setClientSize(socklen_t client_size);
     socklen_t getClientSize();
-}
+};
 
 
 #endif

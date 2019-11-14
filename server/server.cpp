@@ -26,6 +26,7 @@ int main (){
   Corpo *c12 = new Corpo(-10, 10, rand()%45, rand()%190);
   Corpo *c13 = new Corpo(10, -10, rand()%45, rand()%190);
   Corpo *c14 = new Corpo(-10, 10, rand()%45, rand()%190);
+  Corpo *c15 = new Corpo(-10, -10, rand()%45, rand()%190);
 
   // O jogador comeca orbitando
   c1->set_orb(4);
@@ -33,7 +34,7 @@ int main (){
 
   
   // Bolas inimigas
-  //c2->set_cor(2);
+  c2->set_cor(2);
   c3->set_cor(2);
   c4->set_cor(2);
   c5->set_cor(2);
@@ -61,10 +62,6 @@ int main (){
   l->add_corpo(c13);
   l->add_corpo(c14);
   
-  std::string s = l->serialize();
-  std::cout<<s;
-  return 0;
-  
 
   Fisica *f = new Fisica(l, mapa);
 
@@ -74,7 +71,7 @@ int main (){
 
   Servidor *servidor = new Servidor();
   servidor->initServer();
-  std::thread newthread(threadfun, (servidor));
+  std::thread newthread(threadServerfun, servidor);
   (servidor->kb_thread).swap(newthread);
 
 

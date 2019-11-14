@@ -13,7 +13,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
-#include "../json.hpp"
+#include "../headers/json.hpp"
 
 #define  MAX_Y 200
 #define  MIN_Y 2
@@ -163,6 +163,6 @@ class Servidor {
     socklen_t getClientSize();
 };
 
-void threadfun (Servidor* server);
+void threadServerfun (Servidor* server);
 
 #endif

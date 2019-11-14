@@ -9,7 +9,7 @@
 using namespace std::chrono;
 
 // Funcao que roda em uma segunda thread para capturar o teclado
-void threadfun (char *keybuffer, int *control)
+void threadKeyboardfun(char *keybuffer, int *control)
 {
   char c;
   while ((*control) == 1) {
@@ -38,7 +38,7 @@ void Teclado::init() {
   curs_set(0);           /* Do not display cursor */
 
   this->rodando = 1;
-  std::thread newthread(threadfun, &(this->ultima_captura), &(this->rodando));
+  std::thread newthread(threadKeyboardfun, &(this->ultima_captura), &(this->rodando));
   (this->kb_thread).swap(newthread);
 }
 
@@ -56,7 +56,13 @@ char Teclado::getchar() {
 
 
 
-// Classe corpo
+using json = nlohmann::json;
+
+// Classe Corpo
+
+Corpo::Corpo() {
+}
+
 
 Corpo::Corpo(float vX, float vY, float posX, float posY) {
   this->velX = vX;
@@ -87,22 +93,22 @@ float Corpo::get_posY() {
 float Corpo::get_posX() {
   return this->posX;
 }
-void Corpo::set_orb(char orb){
+void Corpo::set_orb(int orb){
   this->orb = orb;
 }
-char Corpo::get_orb(){
+int Corpo::get_orb(){
   return this->orb;
 }
-void Corpo::set_rot(char rot){
+void Corpo::set_rot(int rot){
   this->rot = rot;
 }
-char Corpo::get_rot(){
+int Corpo::get_rot(){
   return this->rot;
 }
-void Corpo::set_cor(char cor){
+void Corpo::set_cor(int cor){
   this->cor = cor;
 }
-char Corpo::get_cor(){
+int Corpo::get_cor(){
   return this->cor;
 }
 int Corpo::get_pos_orb(){
@@ -111,7 +117,33 @@ int Corpo::get_pos_orb(){
 void Corpo::set_pos_orb(int pos_orb){
   this->pos_orb = pos_orb;
 }
+// Funcao para serializar um corpo
+std::string Corpo::serialize(){
+  json j;
+  j["velY"] = this->velY;
+  j["velX"] = this->velX;
+  j["posY"] = this->posY;
+  j["posX"] = this->posX;
+  j["orb"] = this->orb;
+  j["rot"] = this->rot;
+  j["pos_orb"] = this->pos_orb;
+  j["cor"] = this->cor;
 
+  return j.dump();
+}
+
+void Corpo::unserialize(std::string corpo_serializado){
+  json j;
+  j = json::parse(corpo_serializado);
+  this->velY = j.at("velY");
+  this->velX = j.at("velX");
+  this->posY = j.at("posY");
+  this->posX = j.at("posX");
+  this->orb = j.at("orb");
+  this->rot = j.at("rot");
+  this->pos_orb = j.at("pos_orb");
+  this->cor = j.at("cor");
+}
 
 
 // Classe ListaDeCorpos
@@ -139,7 +171,21 @@ void ListaDeCorpos::add_corpo(Corpo *c) {
 std::vector<Corpo*> *ListaDeCorpos::get_corpos() {
   return (this->corpos);
 }
-
+std::string ListaDeCorpos::serialize() {
+  json j;
+  int i;
+  for(i=0;i<corpos->size();i++) {
+    j[i] = corpos->at(i)->serialize();
+  }
+  return j.dump();
+}
+void ListaDeCorpos::unserialize(std::string lista_serializada) {
+  json j;
+  j = json::parse(lista_serializada);
+  for(int i = 0; i<corpos->size(); i++) {
+    corpos->at(i)->unserialize(j.at(i));
+  }
+}
 
 
 // Classe Mapa
@@ -584,7 +630,7 @@ void Cliente::initClient() {
   target.sin_family = AF_INET;
   target.sin_port = htons(3001);
   inet_aton("192.168.0.48", &(target.sin_addr));
-  connect(socket_fd, (struct sockaddr*)&target, sizeof(target)) != 0)
+  connect(socket_fd, (struct sockaddr*)&target, sizeof(target));
 }
 
 

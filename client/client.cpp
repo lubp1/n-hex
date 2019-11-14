@@ -28,16 +28,15 @@ int main() {
   Tela *tela = new Tela(l, 20, 20, 20, 20, mapa);
   tela->init();
 
-  Cliente *client = new Cliente();
-  client->initClient();
+  Cliente *cliente = new Cliente();
+  cliente->initClient();
 
   uint64_t t0;
   uint64_t t1;
   uint64_t deltaT;
   uint64_t T;
   uint64_t ts0, ts1;
-
-  int i = 0;
+  char c;
 
   T = get_now_ms();
   t1 = T;
@@ -49,8 +48,8 @@ int main() {
     if(c == ' ' || c == 'q'){
       printf("TESTE\n");
       /* Agora, meu socket funciona como um descritor de arquivo usual */
-      send(socket_fd, &c, 1, 0);
-      send(socket_fd, 0, 1, 0);
+      send(cliente->getSocket(), &c, 1, 0);
+      send(cliente->getSocket(), 0, 1, 0);
       if(c == 'q') {
         break;
       }
@@ -59,7 +58,7 @@ int main() {
     std::this_thread::sleep_for (std::chrono::milliseconds(100));
   }
 
-  client->endClient();
+  cliente->endClient();
   tela->stop();
 
 

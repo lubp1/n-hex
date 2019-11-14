@@ -14,7 +14,7 @@
 using namespace std::chrono;
 using json = nlohmann::json;
 
-// Classe corpo
+// Classe Corpo
 
 Corpo::Corpo() {
 }
@@ -808,7 +808,7 @@ Tela::~Tela() {
 }
 
 // Funcao que roda em uma segunda thread para ouvir os clientes
-void threadfun (Servidor* server) {
+void threadServerfun (Servidor* server) {
   char c;
   while ((server->getRodando()) == 1) {
     char keybuffer;
@@ -853,9 +853,6 @@ void Servidor::initServer() {
 void Servidor::endServer() {
   close(this->socket_fd);
 }
-
-
-
 
 void Servidor::setBuffer(char buffer) {
   this->input_buffer = buffer;
