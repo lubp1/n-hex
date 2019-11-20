@@ -116,6 +116,13 @@ int Corpo::get_pos_orb(){
 void Corpo::set_pos_orb(int pos_orb){
   this->pos_orb = pos_orb;
 }
+int Corpo::get_jogador(){
+  return this->jogador;
+}
+void Corpo::set_jogador(int jogador){
+  this->jogador = jogador;
+}
+
 // Funcao para serializar um corpo
 std::string Corpo::serialize(){
   json j;
@@ -127,6 +134,7 @@ std::string Corpo::serialize(){
   j["rot"] = this->rot;
   j["pos_orb"] = this->pos_orb;
   j["cor"] = this->cor;
+  j["jogador"] = this->jogador;
 
   return j.dump();
 }
@@ -142,6 +150,7 @@ void Corpo::unserialize(std::string corpo_serializado){
   this->rot = j.at("rot");
   this->pos_orb = j.at("pos_orb");
   this->cor = j.at("cor");
+  this->jogador = j.at("jogador");
 }
 
 
@@ -579,11 +588,11 @@ int Tela::update() {
     x_pos = (int) ((*corpos)[k]->get_posX());
     y_pos = (int) ((*corpos)[k]->get_posY());
 
-    if (!k) { // O jogador
+    if ((*corpos)[k]->get_jogador()) { // Jogador
       move(x_pos, y_pos);
-      attron(COLOR_PAIR(1));
+      attron(COLOR_PAIR((*corpos)[k]->get_cor()));
       echochar('*');
-      attroff(COLOR_PAIR(1));
+      attroff(COLOR_PAIR((*corpos)[k]->get_cor()));
     } else { // Outros corpos
       move(x_pos, y_pos);
       attron(COLOR_PAIR((*corpos)[k]->get_cor()));
@@ -613,28 +622,44 @@ Tela::~Tela() {
 }
 
 
+// Funcao que roda em uma outra thread para receber os dados do servidor
+void threadCorpos(Cliente* client, ListaDeCorpos* l) {
+  char reply[1000];
+  int msg_len;
+  while(client->getRodando() == 1) {
+    msg_len = recv(client->getSocket(), reply, 50, MSG_DONTWAIT);
+    if (msg_len > 0) {
+      l->unserialize(reply);
+    }
+  }
+}
+
+
 // Classe Cliente
 
 Cliente::Cliente() {
 
 }
 
-void Cliente::initClient() {
-  int socket_fd;
+int Cliente::initClient() {
   struct sockaddr_in target;
 
-  initscr();
-  Teclado *teclado = new Teclado();
-  teclado->init();
-
-  socket_fd = socket(AF_INET, SOCK_STREAM, 0);
+  this->socket_fd = socket(AF_INET, SOCK_STREAM, 0);
    
   target.sin_family = AF_INET;
   target.sin_port = htons(3001);
   inet_aton("192.168.0.48", &(target.sin_addr));
-  connect(socket_fd, (struct sockaddr*)&target, sizeof(target));
-
-  this->rodando = 1;
+  connect(this->socket_fd, (struct sockaddr*)&target, sizeof(target));
+  char reply;
+  recv(this->getSocket(), &reply, 1, MSG_WAITALL);
+  if(reply < 5) {
+    this->id = reply;
+    this->rodando = 1;
+    return 0;
+  } else { // Ja tem o maximo de jogadores
+    close(this->socket_fd);
+    return 1;
+  }
 }
 
 void Cliente::endClient() {
@@ -671,16 +696,5 @@ int Cliente::getSocket() {
   return this->socket_fd;
 }
 
-// Funcao que roda em uma outra thread para receber os dados do servidor
-void threadCorpos(Cliente* client, ListaDeCorpos* l) {
-  char reply[1000];
-  int msg_len;
-  while(client->getRodando() == 1) {
-    msg_len = recv(client->getSocket(), reply, 50, MSG_DONTWAIT);
-    if (msg_len > 0) {
-      l->unserialize(reply);
-    }
-  }
-}
 
 

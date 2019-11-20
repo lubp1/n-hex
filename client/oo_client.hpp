@@ -51,6 +51,7 @@ class Corpo {
   int rot; // O sentido da rotacao do corpo
   int pos_orb; // Posicao do corpo no vetor de orbitas
   int cor; // Cor do corpo, 0 eh um corpo neutro, 1 da cor do usuario e 2 inimigo
+  int jogador; // 0 se nao eh um jogador, 1 se eh um jogador
 
 
   public:
@@ -69,6 +70,8 @@ class Corpo {
   int get_cor();
   void set_pos_orb(int pos_orb);
   int get_pos_orb();
+  void set_jogador(int jogador);
+  int get_jogador();
   std::string serialize();
   void unserialize(std::string corpo_serializado);
 };
@@ -148,6 +151,7 @@ class Cliente {
     struct sockaddr_in myself;
     char input_buffer;
     int rodando;
+    int id;
     ListaDeCorpos* l;
 
 
@@ -157,7 +161,7 @@ class Cliente {
     std::thread corpos_thread;
 
     Cliente();
-    void initClient();
+    int initClient();
     void endClient();
     void setBuffer(char buffer);
     char getBuffer();

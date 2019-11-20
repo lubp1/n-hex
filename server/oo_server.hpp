@@ -19,6 +19,7 @@
 #define  MIN_Y 2
 #define  MAX_X 49
 #define  MIN_X 2
+#define MAX_PLAYERS 5
 
 
 // Classe de corpos. Cada corpo possui sua velocidade e posicao nos eixos X e Y, alem de atributos de sua rotacao e cor
@@ -31,7 +32,8 @@ class Corpo {
   int orb; // Em qual nivel de orbita em torno do hexagono o corpo esta, entre 0 (nao em orbita) e de 1 a 4 (da orbita mais interna a mais externa, respectivamente)
   int rot; // O sentido da rotacao do corpo
   int pos_orb; // Posicao do corpo no vetor de orbitas
-  int cor; // Cor do corpo, 0 eh um corpo neutro, 1 da cor do usuario e 2 inimigo
+  int cor; // Cor do corpo, 0 eh um corpo neutro, 1 a 5 sao jogadores
+  int jogador; // 0 se nao eh um jogador, 1 se eh um jogador
 
 
   public:
@@ -50,6 +52,8 @@ class Corpo {
   int get_cor();
   void set_pos_orb(int pos_orb);
   int get_pos_orb();
+  void set_jogador(int jogador);
+  int get_jogador();
   std::string serialize();
   void unserialize(std::string corpo_serializado);
 };
@@ -109,7 +113,7 @@ class Fisica {
   public:
     Fisica(ListaDeCorpos *ldc, Mapa* mapa);
     void add_corpo(Corpo *c);
-    void impulso();
+    void impulso(int id);
     int update(float deltaT, int tamTela);
 };
 
@@ -137,32 +141,45 @@ class Tela {
 class Servidor {
   private:
     int socket_fd;
-    int connection_fd;
+    int connection_fd[MAX_PLAYERS];
+    int conexao_usada[MAX_PLAYERS];
     struct sockaddr_in myself;
     char input_buffer;
+    int input_buffer_id;
     int rodando;
+    int jogadores;
+    int jogador_vivo[MAX_PLAYERS]; // 0 = jogador nao logado, 1 = jogador vivo, -1 = jogador morto
 
 
   public:
     struct sockaddr_in client;
     socklen_t client_size;
-    std::thread kb_thread;
+    std::thread kb_thread, wait_thread, model_thread;
 
     Servidor();
     void initServer();
     void endServer();
     void setBuffer(char buffer);
     char getBuffer();
+    void setBufferID(int id);
+    char getBufferID();
     void setRodando(int rodando);
     int  getRodando();
-    void setConnection(int connection);
-    int  getConnection();
+    void setConnection(int connection, int pos);
+    int  getConnection(int pos);
+    void setConexaoUsada(int conexao, int pos);
+    int  getConexaoUsada(int pos);
     void setSocket(int socket);
     int  getSocket();
     void setClientSize(socklen_t client_size);
     socklen_t getClientSize();
+    void novoJogador();
+    void removeJogador();
+    int getJogadores();
 };
 
 void threadServidor(Servidor* server);
+void threadEsperaServidor(Servidor* server);
+void threadEnviaCorpos(Servidor* server, ListaDeCorpos* l);
 
 #endif

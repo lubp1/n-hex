@@ -73,6 +73,12 @@ int Corpo::get_pos_orb(){
 void Corpo::set_pos_orb(int pos_orb){
   this->pos_orb = pos_orb;
 }
+int Corpo::get_jogador(){
+  return this->jogador;
+}
+void Corpo::set_jogador(int jogador){
+  this->jogador = jogador;
+}
 // Funcao para serializar um corpo
 std::string Corpo::serialize(){
   json j;
@@ -84,6 +90,7 @@ std::string Corpo::serialize(){
   j["rot"] = this->rot;
   j["pos_orb"] = this->pos_orb;
   j["cor"] = this->cor;
+  j["jogador"] = this->jogador;
 
   return j.dump();
 }
@@ -99,6 +106,7 @@ void Corpo::unserialize(std::string corpo_serializado){
   this->rot = j.at("rot");
   this->pos_orb = j.at("pos_orb");
   this->cor = j.at("cor");
+  this->jogador = j.at("jogador");
 }
 
 
@@ -536,51 +544,51 @@ int Fisica::update(float deltaT, int tamTela) {
 
 // Funcao para quando eh dado um impulso em um corpo, que pode fazer ele entrar ou sair da orbita, caso esteja em um hexagono,
 // ou pular algumas posicoes,caso nao esteja em nenhum hexagono
-void Fisica::impulso() {
+void Fisica::impulso(int id) {
 
   std::vector<Corpo *> *c = this->lista->get_corpos();
 
-  int posX = (int)((*c)[0])->get_posX();
-  int posY = (int)((*c)[0])->get_posY();
+  int posX = (int)((*c)[id])->get_posX();
+  int posY = (int)((*c)[id])->get_posY();
 
-  if(((*c)[0])->get_orb() != 0){
+  if(((*c)[id])->get_orb() != 0){
     // Se estiver orbitando
     // Sai da orbita
     int deltaX, deltaY, newVelX, newVelY;
-    if ((*c)[0]->get_rot() == 'h') {
-      if((*c)[0]->get_orb() == 1){
-        deltaX = this->mapa->get_orb1X()[((*c)[0])->get_pos_orb()] - this->mapa->get_orb1X()[((*c)[0])->get_pos_orb() - 1];
-        deltaY = this->mapa->get_orb1Y()[((*c)[0])->get_pos_orb()] - this->mapa->get_orb1Y()[((*c)[0])->get_pos_orb() - 1];
+    if ((*c)[id]->get_rot() == 'h') {
+      if((*c)[id]->get_orb() == 1){
+        deltaX = this->mapa->get_orb1X()[((*c)[id])->get_pos_orb()] - this->mapa->get_orb1X()[((*c)[id])->get_pos_orb() - 1];
+        deltaY = this->mapa->get_orb1Y()[((*c)[id])->get_pos_orb()] - this->mapa->get_orb1Y()[((*c)[id])->get_pos_orb() - 1];
       }
-      else if((*c)[0]->get_orb() == 2){
-        deltaX = this->mapa->get_orb2X()[((*c)[0])->get_pos_orb()] - this->mapa->get_orb2X()[((*c)[0])->get_pos_orb() - 1];
-        deltaY = this->mapa->get_orb2Y()[((*c)[0])->get_pos_orb()] - this->mapa->get_orb2Y()[((*c)[0])->get_pos_orb() - 1];
+      else if((*c)[id]->get_orb() == 2){
+        deltaX = this->mapa->get_orb2X()[((*c)[id])->get_pos_orb()] - this->mapa->get_orb2X()[((*c)[id])->get_pos_orb() - 1];
+        deltaY = this->mapa->get_orb2Y()[((*c)[id])->get_pos_orb()] - this->mapa->get_orb2Y()[((*c)[id])->get_pos_orb() - 1];
       }
-      else if((*c)[0]->get_orb() == 3){
-        deltaX = this->mapa->get_orb3X()[((*c)[0])->get_pos_orb()] - this->mapa->get_orb3X()[((*c)[0])->get_pos_orb() - 1];
-        deltaY = this->mapa->get_orb3Y()[((*c)[0])->get_pos_orb()] - this->mapa->get_orb3Y()[((*c)[0])->get_pos_orb() - 1];
+      else if((*c)[id]->get_orb() == 3){
+        deltaX = this->mapa->get_orb3X()[((*c)[id])->get_pos_orb()] - this->mapa->get_orb3X()[((*c)[id])->get_pos_orb() - 1];
+        deltaY = this->mapa->get_orb3Y()[((*c)[id])->get_pos_orb()] - this->mapa->get_orb3Y()[((*c)[id])->get_pos_orb() - 1];
       }
-      else if((*c)[0]->get_orb() == 4){
-        deltaX = this->mapa->get_orb4X()[((*c)[0])->get_pos_orb()] - this->mapa->get_orb4X()[((*c)[0])->get_pos_orb() - 1];
-        deltaY = this->mapa->get_orb4Y()[((*c)[0])->get_pos_orb()] - this->mapa->get_orb4Y()[((*c)[0])->get_pos_orb() - 1];
+      else if((*c)[id]->get_orb() == 4){
+        deltaX = this->mapa->get_orb4X()[((*c)[id])->get_pos_orb()] - this->mapa->get_orb4X()[((*c)[id])->get_pos_orb() - 1];
+        deltaY = this->mapa->get_orb4Y()[((*c)[id])->get_pos_orb()] - this->mapa->get_orb4Y()[((*c)[id])->get_pos_orb() - 1];
       }
     }
-    else if ((*c)[0]->get_rot() == 'a') {
-      if((*c)[0]->get_orb() == 1){
-        deltaX = this->mapa->get_orb1X()[((*c)[0])->get_pos_orb()] - this->mapa->get_orb1X()[((*c)[0])->get_pos_orb() + 1];
-        deltaY = this->mapa->get_orb1Y()[((*c)[0])->get_pos_orb()] - this->mapa->get_orb1Y()[((*c)[0])->get_pos_orb() + 1];
+    else if ((*c)[id]->get_rot() == 'a') {
+      if((*c)[id]->get_orb() == 1){
+        deltaX = this->mapa->get_orb1X()[((*c)[id])->get_pos_orb()] - this->mapa->get_orb1X()[((*c)[id])->get_pos_orb() + 1];
+        deltaY = this->mapa->get_orb1Y()[((*c)[id])->get_pos_orb()] - this->mapa->get_orb1Y()[((*c)[id])->get_pos_orb() + 1];
       }
-      else if((*c)[0]->get_orb() == 2){
-        deltaX = this->mapa->get_orb2X()[((*c)[0])->get_pos_orb()] - this->mapa->get_orb2X()[((*c)[0])->get_pos_orb() + 1];
-        deltaY = this->mapa->get_orb2Y()[((*c)[0])->get_pos_orb()] - this->mapa->get_orb2Y()[((*c)[0])->get_pos_orb() + 1];
+      else if((*c)[id]->get_orb() == 2){
+        deltaX = this->mapa->get_orb2X()[((*c)[id])->get_pos_orb()] - this->mapa->get_orb2X()[((*c)[id])->get_pos_orb() + 1];
+        deltaY = this->mapa->get_orb2Y()[((*c)[id])->get_pos_orb()] - this->mapa->get_orb2Y()[((*c)[id])->get_pos_orb() + 1];
       }
-      else if((*c)[0]->get_orb() == 3){
-        deltaX = this->mapa->get_orb3X()[((*c)[0])->get_pos_orb()] - this->mapa->get_orb3X()[((*c)[0])->get_pos_orb() + 1];
-        deltaY = this->mapa->get_orb3Y()[((*c)[0])->get_pos_orb()] - this->mapa->get_orb3Y()[((*c)[0])->get_pos_orb() + 1];
+      else if((*c)[id]->get_orb() == 3){
+        deltaX = this->mapa->get_orb3X()[((*c)[id])->get_pos_orb()] - this->mapa->get_orb3X()[((*c)[id])->get_pos_orb() + 1];
+        deltaY = this->mapa->get_orb3Y()[((*c)[id])->get_pos_orb()] - this->mapa->get_orb3Y()[((*c)[id])->get_pos_orb() + 1];
       }
-      else if((*c)[0]->get_orb() == 4){
-        deltaX = this->mapa->get_orb4X()[((*c)[0])->get_pos_orb()] - this->mapa->get_orb4X()[((*c)[0])->get_pos_orb() + 1];
-        deltaY = this->mapa->get_orb4Y()[((*c)[0])->get_pos_orb()] - this->mapa->get_orb4Y()[((*c)[0])->get_pos_orb() + 1];
+      else if((*c)[id]->get_orb() == 4){
+        deltaX = this->mapa->get_orb4X()[((*c)[id])->get_pos_orb()] - this->mapa->get_orb4X()[((*c)[id])->get_pos_orb() + 1];
+        deltaY = this->mapa->get_orb4Y()[((*c)[id])->get_pos_orb()] - this->mapa->get_orb4Y()[((*c)[id])->get_pos_orb() + 1];
       }
     }
     if (deltaX >= 0) {
@@ -595,8 +603,8 @@ void Fisica::impulso() {
       newVelY = -10;
     }
 
-    ((*c)[0])->update(newVelX,newVelY,(*c)[0]->get_posX(),(*c)[0]->get_posY());
-    ((*c)[0])->set_orb(0);
+    ((*c)[id])->update(newVelX,newVelY,(*c)[id]->get_posX(),(*c)[id]->get_posY());
+    ((*c)[id])->set_orb(0);
     return;
   }
 
@@ -606,16 +614,16 @@ void Fisica::impulso() {
 
   // Se estiver fora de um hexagono e longe das bordas do mapa
   if(posX > 5 && posX < 45 && posY > 5 && posY < 195){
-    float velX =  ((*c)[0])->get_velX();
-    float velY =  ((*c)[0])->get_velY();
+    float velX =  ((*c)[id])->get_velX();
+    float velY =  ((*c)[id])->get_velY();
     //Avanca vel/4 posicoes
-    ((*c)[0])->update(velX, velY, posX+velX/4, posY+velY/4);
+    ((*c)[id])->update(velX, velY, posX+velX/4, posY+velY/4);
   }
 
-  char rotacao = this->mapa->rotacao(posX, posY, (int)((*c)[0])->get_velX(), (int)((*c)[0])->get_velY(), orbita, hex_number);
+  char rotacao = this->mapa->rotacao(posX, posY, (int)((*c)[id])->get_velX(), (int)((*c)[id])->get_velY(), orbita, hex_number);
 
-  (*c)[0]->set_orb(orbita);
-  (*c)[0]->set_rot(rotacao);
+  (*c)[id]->set_orb(orbita);
+  (*c)[id]->set_rot(rotacao);
 }
 
 // Classe Tela
@@ -641,7 +649,10 @@ void Tela::init() {
   start_color();
   init_pair(0, COLOR_WHITE, COLOR_BLACK);
   init_pair(1, COLOR_WHITE, COLOR_BLUE);
-  init_pair(2, COLOR_WHITE, COLOR_GREEN);
+  init_pair(2, COLOR_WHITE, COLOR_RED);
+  init_pair(3, COLOR_WHITE, COLOR_YELLOW);
+  init_pair(4, COLOR_WHITE, COLOR_CYAN);
+  init_pair(5, COLOR_WHITE, COLOR_MAGENTA);
 
   // Tamanho do mapa
   this->row = 50;
@@ -774,11 +785,11 @@ int Tela::update() {
     x_pos = (int) ((*corpos)[k]->get_posX());
     y_pos = (int) ((*corpos)[k]->get_posY());
 
-    if (!k) { // O jogador
+    if ((*corpos)[k]->get_jogador()) { // Jogador
       move(x_pos, y_pos);
-      attron(COLOR_PAIR(1));
+      attron(COLOR_PAIR((*corpos)[k]->get_cor()));
       echochar('*');
-      attroff(COLOR_PAIR(1));
+      attroff(COLOR_PAIR((*corpos)[k]->get_cor()));
     } else { // Outros corpos
       move(x_pos, y_pos);
       attron(COLOR_PAIR((*corpos)[k]->get_cor()));
@@ -812,10 +823,15 @@ void threadServidor(Servidor* server) {
   char c;
   while ((server->getRodando()) == 1) {
     char keybuffer;
-    if (recv(server->getConnection(), &keybuffer, 1, 0) == 1) {
-      server->setBuffer(keybuffer);
-    } else {
-      server->setBuffer(0);
+    for(int i = 0; i<MAX_PLAYERS; i++) {
+      if(server->getConexaoUsada(i)) {
+        if (recv(server->getConnection(i), &keybuffer, 1, 0) == 1) {
+          server->setBuffer(keybuffer); // Atualizando buffer
+          server->setBufferID(i); // Atualizando id do caracter enviado
+        } else {
+          server->setBuffer(0);
+        }
+      }
     }
 
     std::this_thread::sleep_for (std::chrono::milliseconds(10));
@@ -823,13 +839,51 @@ void threadServidor(Servidor* server) {
   return;
 }
 
+// Thread que espera novas conexoes
+void threadEsperaServidor(Servidor* server) {
+  int conn_fd;
+  char reply;
+  while(server->getRodando() && server->getJogadores() < 5) {
+    conn_fd = accept(server->getSocket(), (struct sockaddr*)&server->client, &server->client_size);
+    for(int i = 0; i < MAX_PLAYERS; i++) {
+      if(!server->getConexaoUsada(i)) {
+        reply = i;
+        server->setConnection(conn_fd,i);
+        server->novoJogador();
+        send(server->getConnection(i), &reply, 1, 0);
+        return;
+      } else {
+        reply = 5;
+        send(server->getConnection(i), &reply, 1, 0);
+      }
+    }
+  }
+  return;
+}
+
+// Thread para serializar e enviar corpos para os clientes
+void threadEnviaCorpos(Servidor* server, ListaDeCorpos* l) {
+  std::string message = l->serialize();
+  while(server->getRodando()) {
+    for(int i = 0; i < MAX_PLAYERS; i++) {
+      if(server->getConexaoUsada(i)) {
+        send(server->getConnection(i), &message, message.length(), 0);
+      }
+    }
+  }
+}
+
 
 Servidor::Servidor() {
-
+  this->jogadores = 0;
 }
 
 void Servidor::initServer() {
   this->client_size = (socklen_t)sizeof(this->client);
+  for (int i=0; i<MAX_PLAYERS; i++) {
+    this->conexao_usada[i] = 0;
+    this->jogador_vivo[i] = 0;
+  }
 
   this->socket_fd = socket(AF_INET, SOCK_STREAM, 0);
 
@@ -843,19 +897,34 @@ void Servidor::initServer() {
   }
 
   listen(this->socket_fd, 2);
-  this->setConnection(accept(this->getSocket(), (struct sockaddr*)&(this->client), &(this->client_size)));
-
 
   this->rodando = 1;
 }
 
 
 void Servidor::endServer() {
+  for (int i=0; i<MAX_PLAYERS; i++) {
+    if (this->conexao_usada[i]) {
+      this->conexao_usada[i] = 0;
+      close(this->connection_fd[i]);
+    }
+  }
   this->rodando = 0;
   (this->kb_thread).join();
+  (this->wait_thread).join();
   close(this->socket_fd);
 }
 
+
+void Servidor::novoJogador() {
+  this->jogadores++;
+}
+void Servidor::removeJogador() {
+  this->jogadores--;
+}
+int Servidor::getJogadores() {
+  return this->jogadores;
+}
 void Servidor::setBuffer(char buffer) {
   this->input_buffer = buffer;
 }
@@ -864,17 +933,29 @@ char Servidor::getBuffer() {
   this->input_buffer = 0;
   return c;
 }
+void Servidor::setBufferID(int id) {
+  this->input_buffer_id = id;
+}
+char Servidor::getBufferID() {
+  return this->input_buffer_id;
+}
 void Servidor::setRodando(int rodando) {
   this->rodando = rodando;
 }
 int Servidor::getRodando() {
   return this->rodando;
 }
-void Servidor::setConnection(int connection) {
-  this->connection_fd = connection;
+void Servidor::setConnection(int connection, int pos) {
+  this->connection_fd[pos] = connection;
 }
-int Servidor::getConnection() {
-  return this->connection_fd;
+int Servidor::getConnection(int pos) {
+  return this->connection_fd[pos];
+}
+void Servidor::setConexaoUsada(int conexao, int pos) {
+  this->conexao_usada[pos] = conexao;
+}
+int Servidor::getConexaoUsada(int pos) {
+  return this->conexao_usada[pos];
 }
 void Servidor::setSocket(int socket) {
   this->socket_fd = socket;

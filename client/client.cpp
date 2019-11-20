@@ -62,7 +62,11 @@ int main() {
   tela->init();
 
   Cliente *cliente = new Cliente();
-  cliente->initClient();
+  if (cliente->initClient()) {
+    printf("Maximo de jogadores já atingido\n");
+    tela->stop();
+    return 1;
+  }
 
   uint64_t t0;
   uint64_t t1;
@@ -76,7 +80,7 @@ int main() {
   int tela_pequena = 0; // Marca se a tela eh menor que o suportado pelo jogo
   int ganhou = 0;
 
-  // Criando thread para receber a lista de corpos
+  // Criando thread para receber a lista de corpos do servidor
   std::thread newthread(threadCorpos, cliente, l);
   (cliente->corpos_thread).swap(newthread);
 

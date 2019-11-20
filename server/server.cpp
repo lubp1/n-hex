@@ -33,17 +33,6 @@ int main (){
   c1->set_rot('a');
 
   
-  // Bolas inimigas
-  c2->set_cor(2);
-  c3->set_cor(2);
-  c4->set_cor(2);
-  c5->set_cor(2);
-  c6->set_cor(2);
-  c7->set_cor(2);
-  c8->set_cor(2);
-  c9->set_cor(2);
-  c10->set_cor(2);
-  c11->set_cor(2);
 
   ListaDeCorpos *l = new ListaDeCorpos();
 
@@ -71,8 +60,15 @@ int main (){
 
   Servidor *servidor = new Servidor();
   servidor->initServer();
+  // Thread para receber os comandos dos usuarios
   std::thread newthread(threadServidor, servidor);
   (servidor->kb_thread).swap(newthread);
+  // Thread que espera a conexão de usuarios
+  std::thread newthread2(threadEsperaServidor, servidor);
+  (servidor->wait_thread).swap(newthread2);
+  // Thread que envia o model para os usuarios
+  std::thread newthread3(threadEnviaCorpos, servidor, l);
+  (servidor->wait_thread).swap(newthread3);
 
 
   uint64_t t0;
@@ -87,6 +83,11 @@ int main (){
   t1 = T;
   int tela_pequena = 0; // Marca se a tela eh menor que o suportado pelo jogo
   int ganhou = 0;
+
+  // Colorindo os jogadores
+  for(int i = 0; i<servidor->getJogadores(); i++) {
+    l->get_corpos()->at(i)->set_cor(i+1);
+  }
 
   while (1) {
 
@@ -107,9 +108,10 @@ int main (){
 
     // Lê o teclado
     char c = servidor->getBuffer();
+    int id = servidor->getBufferID();
 
     if (c==' ') {
-      f->impulso();
+      f->impulso(id);
     }
     else if (c=='q' || c=='Q') {
       break;
@@ -125,4 +127,6 @@ int main (){
     std::this_thread::sleep_for (std::chrono::milliseconds(100));
     i++;
   }
+
+  tela->stop();
 }
