@@ -8,9 +8,8 @@
 
 using namespace std::chrono;
 
-// Funcao que roda em uma segunda thread para capturar o teclado
-void threadKeyboardfun(char *keybuffer, int *control)
-{
+// Funcao que roda em uma outra thread para capturar o teclado
+void threadTeclado(char *keybuffer, int *control) {
   char c;
   while ((*control) == 1) {
     c = getch();
@@ -38,7 +37,7 @@ void Teclado::init() {
   curs_set(0);           /* Do not display cursor */
 
   this->rodando = 1;
-  std::thread newthread(threadKeyboardfun, &(this->ultima_captura), &(this->rodando));
+  std::thread newthread(threadTeclado, &(this->ultima_captura), &(this->rodando));
   (this->kb_thread).swap(newthread);
 }
 
@@ -613,6 +612,9 @@ Tela::~Tela() {
   this->stop();;
 }
 
+
+// Classe Cliente
+
 Cliente::Cliente() {
 
 }
@@ -631,14 +633,15 @@ void Cliente::initClient() {
   target.sin_port = htons(3001);
   inet_aton("192.168.0.48", &(target.sin_addr));
   connect(socket_fd, (struct sockaddr*)&target, sizeof(target));
-}
 
+  this->rodando = 1;
+}
 
 void Cliente::endClient() {
+  this->rodando = 0;
+  (this->corpos_thread).join();
   close(this->socket_fd);
 }
-
-
 
 
 void Cliente::setBuffer(char buffer) {
@@ -667,3 +670,17 @@ void Cliente::setSocket(int socket) {
 int Cliente::getSocket() {
   return this->socket_fd;
 }
+
+// Funcao que roda em uma outra thread para receber os dados do servidor
+void threadCorpos(Cliente* client, ListaDeCorpos* l) {
+  char reply[1000];
+  int msg_len;
+  while(client->getRodando() == 1) {
+    msg_len = recv(client->getSocket(), reply, 50, MSG_DONTWAIT);
+    if (msg_len > 0) {
+      l->unserialize(reply);
+    }
+  }
+}
+
+

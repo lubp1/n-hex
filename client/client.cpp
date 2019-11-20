@@ -18,12 +18,45 @@ uint64_t get_now_ms() {
 
 int main() {
 
+  Corpo *c1 = new Corpo(0, 0, 0, 0); //nave
+  Corpo *c2 = new Corpo(0, 0, 0, 0);
+  Corpo *c3 = new Corpo(0, 0, 0, 0);
+  Corpo *c4 = new Corpo(0, 0, 0, 0);
+  Corpo *c5 = new Corpo(0, 0, 0, 0);
+  Corpo *c6 = new Corpo(0, 0, 0, 0);
+  Corpo *c7 = new Corpo(0, 0, 0, 0);
+  Corpo *c8 = new Corpo(0, 0, 0, 0);
+  Corpo *c9 = new Corpo(0, 0, 0, 0);
+  Corpo *c10 = new Corpo(0, 0, 0, 0);
+  Corpo *c11 = new Corpo(0, 0, 0, 0);
+  Corpo *c12 = new Corpo(0, 0, 0, 0);
+  Corpo *c13 = new Corpo(0, 0, 0, 0);
+  Corpo *c14 = new Corpo(0, 0, 0, 0);
+  Corpo *c15 = new Corpo(0, 0, 0, 0);
+
+  ListaDeCorpos *l = new ListaDeCorpos();
+
+  l->add_corpo(c1);
+  l->add_corpo(c2);
+  l->add_corpo(c3);
+  l->add_corpo(c4);
+  l->add_corpo(c5);
+  l->add_corpo(c6);
+  l->add_corpo(c7);
+  l->add_corpo(c8);
+  l->add_corpo(c9);
+  l->add_corpo(c10);
+  l->add_corpo(c11);
+  l->add_corpo(c12);
+  l->add_corpo(c13);
+  l->add_corpo(c14);
+  l->add_corpo(c15);
+
 
   Teclado *teclado = new Teclado();
   teclado->init();
 
   Mapa* mapa = new Mapa();
-  ListaDeCorpos *l = new ListaDeCorpos();
 
   Tela *tela = new Tela(l, 20, 20, 20, 20, mapa);
   tela->init();
@@ -42,6 +75,10 @@ int main() {
   t1 = T;
   int tela_pequena = 0; // Marca se a tela eh menor que o suportado pelo jogo
   int ganhou = 0;
+
+  // Criando thread para receber a lista de corpos
+  std::thread newthread(threadCorpos, cliente, l);
+  (cliente->corpos_thread).swap(newthread);
 
   while (1) {
       

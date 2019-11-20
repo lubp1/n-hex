@@ -808,7 +808,7 @@ Tela::~Tela() {
 }
 
 // Funcao que roda em uma segunda thread para ouvir os clientes
-void threadServerfun (Servidor* server) {
+void threadServidor(Servidor* server) {
   char c;
   while ((server->getRodando()) == 1) {
     char keybuffer;
@@ -851,6 +851,8 @@ void Servidor::initServer() {
 
 
 void Servidor::endServer() {
+  this->rodando = 0;
+  (this->kb_thread).join();
   close(this->socket_fd);
 }
 

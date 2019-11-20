@@ -21,7 +21,7 @@
 
 
 // Funcao que roda em outra thread para ler o teclado
-void threadKeyboardfun (char *keybuffer, int *control);
+void threadTeclado (char *keybuffer, int *control);
 
 // Classe que le do teclado
 class Teclado {
@@ -140,6 +140,7 @@ class Tela {
     int getCols(void);
 };
 
+
 class Cliente {
     private:
     int socket_fd;
@@ -147,12 +148,13 @@ class Cliente {
     struct sockaddr_in myself;
     char input_buffer;
     int rodando;
+    ListaDeCorpos* l;
 
 
   public:
     struct sockaddr_in client;
     socklen_t client_size;
-    std::thread kb_thread;
+    std::thread corpos_thread;
 
     Cliente();
     void initClient();
@@ -168,6 +170,8 @@ class Cliente {
     void setClientSize(socklen_t client_size);
     socklen_t getClientSize();
 };
+
+void threadCorpos(Cliente* client, ListaDeCorpos* l);
 
 
 #endif

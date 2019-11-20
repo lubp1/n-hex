@@ -163,6 +163,6 @@ class Servidor {
     socklen_t getClientSize();
 };
 
-void threadServerfun (Servidor* server);
+void threadServidor(Servidor* server);
 
 #endif

@@ -71,7 +71,7 @@ int main (){
 
   Servidor *servidor = new Servidor();
   servidor->initServer();
-  std::thread newthread(threadServerfun, servidor);
+  std::thread newthread(threadServidor, servidor);
   (servidor->kb_thread).swap(newthread);
 
 
