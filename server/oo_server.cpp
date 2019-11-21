@@ -5,6 +5,8 @@
 #include "oo_server.hpp"
 #include <cstdlib>
 #include <ncurses.h>
+#include <string>
+#include <cstring>
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -137,8 +139,7 @@ std::vector<Corpo*> *ListaDeCorpos::get_corpos() {
 }
 std::string ListaDeCorpos::serialize() {
   json j;
-  int i;
-  for(i=0;i<corpos->size();i++) {
+  for(int i = 0; i < corpos->size(); i++) {
     j[i] = corpos->at(i)->serialize();
   }
   return j.dump();
@@ -517,19 +518,19 @@ int Fisica::update(float deltaT, int tamTela) {
             float velYi = (*c)[i]->get_velY();
             float velXj = (*c)[j]->get_velX();
             float velYj = (*c)[j]->get_velY();
-            if(!i) {
-              if(!(*c)[j]->get_cor()) {
-                (*c)[j]->set_cor(1);
+            if(!(*c)[i]->get_jogador()) { // Se nao eh jogador
+              if(!(*c)[j]->get_cor()) { // Se for um corpo neutro
+                (*c)[j]->set_cor((*c)[i]->get_cor());
               }
-              else if ((*c)[j]->get_cor() != 1) {
+              else if ((*c)[j]->get_cor() != (*c)[i]->get_cor()) { // Se colidiu com uma bola inimiga
                 return 1;
               }
             }
-            if(!j) {
-              if(!(*c)[i]->get_cor()) {
-                (*c)[i]->set_cor(1);
+            if(!(*c)[j]->get_jogador()) {
+              if(!(*c)[i]->get_cor()) { // Se for um corpo neutro
+                (*c)[i]->set_cor((*c)[j]->get_cor());
               }
-              else if ((*c)[i]->get_cor() != 1) {
+              else if ((*c)[i]->get_cor() != (*c)[j]->get_cor()) { // Se colidiu com uma bola inimiga
                 return 1;
               }
             }
@@ -818,6 +819,7 @@ Tela::~Tela() {
   this->stop();;
 }
 
+
 // Funcao que roda em uma segunda thread para ouvir os clientes
 void threadServidor(Servidor* server) {
   char c;
@@ -849,8 +851,9 @@ void threadEsperaServidor(Servidor* server) {
       if(!server->getConexaoUsada(i)) {
         reply = i;
         server->setConnection(conn_fd,i);
+        server->setConexaoUsada(1,i);
         server->novoJogador();
-        send(server->getConnection(i), &reply, 1, 0);
+        send(conn_fd, &reply, 1, 0);
         return;
       } else {
         reply = 5;
@@ -863,11 +866,13 @@ void threadEsperaServidor(Servidor* server) {
 
 // Thread para serializar e enviar corpos para os clientes
 void threadEnviaCorpos(Servidor* server, ListaDeCorpos* l) {
-  std::string message = l->serialize();
   while(server->getRodando()) {
+    std::string message = l->serialize();
     for(int i = 0; i < MAX_PLAYERS; i++) {
       if(server->getConexaoUsada(i)) {
-        send(server->getConnection(i), &message, message.length(), 0);
+        char mensagem[10000];
+        strcpy(mensagem,message.c_str());
+        send(server->getConnection(i), &mensagem, 10000, 0);
       }
     }
   }
@@ -889,7 +894,7 @@ void Servidor::initServer() {
 
   (this->myself).sin_family = AF_INET;
   (this->myself).sin_port = htons(3001);
-  inet_aton("192.168.0.48", &((this->myself).sin_addr));
+  inet_aton("127.0.0.1", &((this->myself).sin_addr));
 
 
   if (bind(this->socket_fd, (struct sockaddr*)&(this->myself), sizeof(this->myself)) != 0) {
@@ -912,6 +917,7 @@ void Servidor::endServer() {
   this->rodando = 0;
   (this->kb_thread).join();
   (this->wait_thread).join();
+  (this->model_thread).join();
   close(this->socket_fd);
 }
 

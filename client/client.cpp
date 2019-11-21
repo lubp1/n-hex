@@ -18,7 +18,7 @@ uint64_t get_now_ms() {
 
 int main() {
 
-  Corpo *c1 = new Corpo(0, 0, 0, 0); //nave
+  Corpo *c1 = new Corpo(0, 0, 0, 0);
   Corpo *c2 = new Corpo(0, 0, 0, 0);
   Corpo *c3 = new Corpo(0, 0, 0, 0);
   Corpo *c4 = new Corpo(0, 0, 0, 0);
@@ -53,20 +53,20 @@ int main() {
   l->add_corpo(c15);
 
 
-  Teclado *teclado = new Teclado();
-  teclado->init();
+  Cliente *cliente = new Cliente();
+  if (cliente->initClient()) {
+    printf("Nao foi possivel conectar ao servidor\n");
+    return 1;
+  }
 
   Mapa* mapa = new Mapa();
 
   Tela *tela = new Tela(l, 20, 20, 20, 20, mapa);
   tela->init();
 
-  Cliente *cliente = new Cliente();
-  if (cliente->initClient()) {
-    printf("Maximo de jogadores já atingido\n");
-    tela->stop();
-    return 1;
-  }
+  Teclado *teclado = new Teclado();
+  teclado->init();
+
 
   uint64_t t0;
   uint64_t t1;
@@ -83,17 +83,21 @@ int main() {
   // Criando thread para receber a lista de corpos do servidor
   std::thread newthread(threadCorpos, cliente, l);
   (cliente->corpos_thread).swap(newthread);
+  // Criando thread para enviar comandos para o servidor
+  std::thread newthread2(threadEnviaComandos, cliente, teclado);
+  (cliente->kb_thread).swap(newthread2);
 
   while (1) {
+    // Atualiza timers
+    t0 = t1;
+    t1 = get_now_ms();
+    deltaT = t1-t0;
+
+     // Atualiza tela
+    tela_pequena = tela->update();
       
-    if(c == ' ' || c == 'q'){
-      printf("TESTE\n");
-      /* Agora, meu socket funciona como um descritor de arquivo usual */
-      send(cliente->getSocket(), &c, 1, 0);
-      send(cliente->getSocket(), 0, 1, 0);
-      if(c == 'q') {
-        break;
-      }
+    if(teclado->getchar() == 'q') {
+      break;
     }
 
     std::this_thread::sleep_for (std::chrono::milliseconds(100));
@@ -101,7 +105,7 @@ int main() {
 
   cliente->endClient();
   tela->stop();
-
+  teclado->stop();
 
   if(ganhou) {
     printf("Você ganhou o jogo em %lu segundos\n", (get_now_ms()-T)/1000);
@@ -110,8 +114,6 @@ int main() {
     printf("Sobreviveu por %lu segundos\n", (get_now_ms()-T)/1000);
   }
 
-  return 0;
-  teclado->stop();
 
   return 0;
 }

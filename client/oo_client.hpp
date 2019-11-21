@@ -158,7 +158,7 @@ class Cliente {
   public:
     struct sockaddr_in client;
     socklen_t client_size;
-    std::thread corpos_thread;
+    std::thread corpos_thread, kb_thread;
 
     Cliente();
     int initClient();
@@ -176,6 +176,7 @@ class Cliente {
 };
 
 void threadCorpos(Cliente* client, ListaDeCorpos* l);
+void threadEnviaComandos(Cliente* client, Teclado* teclado);
 
 
 #endif

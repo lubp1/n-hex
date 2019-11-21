@@ -189,6 +189,9 @@ std::string ListaDeCorpos::serialize() {
 }
 void ListaDeCorpos::unserialize(std::string lista_serializada) {
   json j;
+  if(lista_serializada.length() < 10) {
+    return;
+  }
   j = json::parse(lista_serializada);
   for(int i = 0; i<corpos->size(); i++) {
     corpos->at(i)->unserialize(j.at(i));
@@ -624,16 +627,27 @@ Tela::~Tela() {
 
 // Funcao que roda em uma outra thread para receber os dados do servidor
 void threadCorpos(Cliente* client, ListaDeCorpos* l) {
-  char reply[1000];
+  char reply[10000];
   int msg_len;
   while(client->getRodando() == 1) {
-    msg_len = recv(client->getSocket(), reply, 50, MSG_DONTWAIT);
-    if (msg_len > 0) {
+    msg_len = recv(client->getSocket(), reply, 10000, MSG_DONTWAIT);
+    if (msg_len > 10) {
+      std::string data(reply);
       l->unserialize(reply);
     }
   }
 }
 
+void threadEnviaComandos(Cliente* client, Teclado* teclado) {
+  while(client->getRodando()) {
+    char c = teclado->getchar();
+    if(c == ' ' || c == 'q'){
+      send(client->getSocket(), &c, 1, 0);
+      send(client->getSocket(), 0, 1, 0);
+    }
+  }
+  
+}
 
 // Classe Cliente
 
@@ -648,10 +662,16 @@ int Cliente::initClient() {
    
   target.sin_family = AF_INET;
   target.sin_port = htons(3001);
-  inet_aton("192.168.0.48", &(target.sin_addr));
-  connect(this->socket_fd, (struct sockaddr*)&target, sizeof(target));
+  inet_aton("127.0.0.1", &(target.sin_addr));
+  if(connect(this->socket_fd, (struct sockaddr*)&target, sizeof(target))) {
+    return 1;
+  }
+  
+  
+  
+  
   char reply;
-  recv(this->getSocket(), &reply, 1, MSG_WAITALL);
+  recv(this->getSocket(), &reply, 1, MSG_WAITALL); // Recebendo ID do cliente
   if(reply < 5) {
     this->id = reply;
     this->rodando = 1;
@@ -665,6 +685,7 @@ int Cliente::initClient() {
 void Cliente::endClient() {
   this->rodando = 0;
   (this->corpos_thread).join();
+  (this->kb_thread).join();
   close(this->socket_fd);
 }
 
