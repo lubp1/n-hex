@@ -189,9 +189,6 @@ std::string ListaDeCorpos::serialize() {
 }
 void ListaDeCorpos::unserialize(std::string lista_serializada) {
   json j;
-  if(lista_serializada.length() < 10) {
-    return;
-  }
   j = json::parse(lista_serializada);
   for(int i = 0; i<corpos->size(); i++) {
     corpos->at(i)->unserialize(j.at(i));
@@ -633,11 +630,13 @@ void threadCorpos(Cliente* client, ListaDeCorpos* l) {
     msg_len = recv(client->getSocket(), reply, 10000, MSG_DONTWAIT);
     if (msg_len > 10) {
       std::string data(reply);
-      l->unserialize(reply);
+      if (data.length() > 1)
+        l->unserialize(data);
     }
   }
 }
 
+// Thread que envia os comandos do teclado
 void threadEnviaComandos(Cliente* client, Teclado* teclado) {
   while(client->getRodando()) {
     char c = teclado->getchar();
@@ -666,20 +665,8 @@ int Cliente::initClient() {
   if(connect(this->socket_fd, (struct sockaddr*)&target, sizeof(target))) {
     return 1;
   }
-  
-  
-  
-  
-  char reply;
-  recv(this->getSocket(), &reply, 1, MSG_WAITALL); // Recebendo ID do cliente
-  if(reply < 5) {
-    this->id = reply;
-    this->rodando = 1;
-    return 0;
-  } else { // Ja tem o maximo de jogadores
-    close(this->socket_fd);
-    return 1;
-  }
+  this->rodando = 1;
+  return 0;
 }
 
 void Cliente::endClient() {

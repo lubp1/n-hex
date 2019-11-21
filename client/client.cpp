@@ -104,14 +104,14 @@ int main() {
   }
 
   cliente->endClient();
-  tela->stop();
   teclado->stop();
+  tela->stop();
 
   if(ganhou) {
     printf("Você ganhou o jogo em %lu segundos\n", (get_now_ms()-T)/1000);
   }
   else if(!tela_pequena) {
-    printf("Sobreviveu por %lu segundos\n", (get_now_ms()-T)/1000);
+    printf("Derrota! Sobreviveu por %lu segundos\n", (get_now_ms()-T)/1000);
   }
 
 

@@ -823,11 +823,11 @@ Tela::~Tela() {
 // Funcao que roda em uma segunda thread para ouvir os clientes
 void threadServidor(Servidor* server) {
   char c;
-  while ((server->getRodando()) == 1) {
+  while (server->getRodando()) {
     char keybuffer;
-    for(int i = 0; i<MAX_PLAYERS; i++) {
-      if(server->getConexaoUsada(i)) {
-        if (recv(server->getConnection(i), &keybuffer, 1, 0) == 1) {
+    for (int i = 0; i<MAX_PLAYERS; i++) {
+      if (server->getConexaoUsada(i) == 1) {
+        if (recv(server->getConnection(i), &keybuffer, 1, MSG_DONTWAIT) != -1) {
           server->setBuffer(keybuffer); // Atualizando buffer
           server->setBufferID(i); // Atualizando id do caracter enviado
         } else {
@@ -838,6 +838,7 @@ void threadServidor(Servidor* server) {
 
     std::this_thread::sleep_for (std::chrono::milliseconds(10));
   }
+  printf("Saindo da thread de ouvir clientes.\n");
   return;
 }
 
@@ -845,22 +846,22 @@ void threadServidor(Servidor* server) {
 void threadEsperaServidor(Servidor* server) {
   int conn_fd;
   char reply;
-  while(server->getRodando() && server->getJogadores() < 5) {
+  while(server->getRodando()) {
     conn_fd = accept(server->getSocket(), (struct sockaddr*)&server->client, &server->client_size);
-    for(int i = 0; i < MAX_PLAYERS; i++) {
-      if(!server->getConexaoUsada(i)) {
-        reply = i;
-        server->setConnection(conn_fd,i);
-        server->setConexaoUsada(1,i);
-        server->novoJogador();
-        send(conn_fd, &reply, 1, 0);
-        return;
-      } else {
-        reply = 5;
-        send(server->getConnection(i), &reply, 1, 0);
+    if (conn_fd != -1) {
+      for(int i = 0; i < MAX_PLAYERS; i++) {
+        if(!server->getConexaoUsada(i)) {
+          printf("Adicionando cliente %d.\n", i);
+          reply = i;
+          server->setConnection(conn_fd,i);
+          server->setConexaoUsada(1,i);
+          server->novoJogador();
+          break;
+        }
       }
     }
   }
+  printf("Saindo da thread de esperar conexoes.\n");
   return;
 }
 
@@ -876,6 +877,8 @@ void threadEnviaCorpos(Servidor* server, ListaDeCorpos* l) {
       }
     }
   }
+  printf("Saindo da thread de serializar corpos.\n");
+  return;
 }
 
 
@@ -884,13 +887,14 @@ Servidor::Servidor() {
 }
 
 void Servidor::initServer() {
+  printf("Iniciando servidor\n");
   this->client_size = (socklen_t)sizeof(this->client);
   for (int i=0; i<MAX_PLAYERS; i++) {
     this->conexao_usada[i] = 0;
     this->jogador_vivo[i] = 0;
   }
 
-  this->socket_fd = socket(AF_INET, SOCK_STREAM, 0);
+  this->socket_fd = socket(AF_INET, SOCK_STREAM | SOCK_NONBLOCK, 0);
 
   (this->myself).sin_family = AF_INET;
   (this->myself).sin_port = htons(3001);
@@ -908,17 +912,21 @@ void Servidor::initServer() {
 
 
 void Servidor::endServer() {
+  printf("Terminando servidor.\n");
+  this->rodando = 0;
+
+
+  // Esperando threads
+  (this->kb_thread).join();
+  (this->wait_thread).join();
+  (this->model_thread).join();
+
   for (int i=0; i<MAX_PLAYERS; i++) {
     if (this->conexao_usada[i]) {
       this->conexao_usada[i] = 0;
       close(this->connection_fd[i]);
     }
   }
-  this->rodando = 0;
-  (this->kb_thread).join();
-  (this->wait_thread).join();
-  (this->model_thread).join();
-  close(this->socket_fd);
 }
 
 

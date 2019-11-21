@@ -56,9 +56,10 @@ int main (){
 
   Fisica *f = new Fisica(l, mapa);
 
-
+  /*
   Tela *tela = new Tela(l, 20, 20, 20, 20, mapa);
   tela->init();
+  */
 
   Servidor *servidor = new Servidor();
   servidor->initServer();
@@ -70,7 +71,7 @@ int main (){
   (servidor->wait_thread).swap(newthread2);
   // Thread que envia o model para os usuarios
   std::thread newthread3(threadEnviaCorpos, servidor, l);
-  (servidor->wait_thread).swap(newthread3);
+  (servidor->model_thread).swap(newthread3);
 
 
   uint64_t t0;
@@ -101,12 +102,15 @@ int main (){
 
 
     // Atualiza modelo
-    if (f->update(deltaT, tela->getRows())) {
+    if (f->update(deltaT, 50)) {
       break;
     }
 
+    /*
     // Atualiza tela
     tela_pequena = tela->update();
+    */
+
 
     // Lê o teclado
     char c = servidor->getBuffer();
@@ -116,6 +120,7 @@ int main (){
       f->impulso(id);
     }
     else if (c=='q' || c=='Q') {
+      printf("Recebido comando para terminar.\n");
       break;
     }
 
@@ -126,5 +131,8 @@ int main (){
     i++;
   }
 
-  tela->stop();
+  servidor->endServer();
+  //tela->stop();
+  printf("Servidor fechado.\n");
+  return 0;
 }
