@@ -17,4 +17,4 @@ servidor: server/server.cpp server/oo_server.cpp server/oo_server.hpp
 	g++ -oservidor server/server.cpp server/oo_server.cpp $(FLAGS)
 
 clear:
-	rm nhex
+	rm servidor cliente

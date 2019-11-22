@@ -23,6 +23,7 @@ int main() {
   Corpo *c3 = new Corpo(0, 0, 0, 0);
   Corpo *c4 = new Corpo(0, 0, 0, 0);
   Corpo *c5 = new Corpo(0, 0, 0, 0);
+  /*
   Corpo *c6 = new Corpo(0, 0, 0, 0);
   Corpo *c7 = new Corpo(0, 0, 0, 0);
   Corpo *c8 = new Corpo(0, 0, 0, 0);
@@ -33,6 +34,7 @@ int main() {
   Corpo *c13 = new Corpo(0, 0, 0, 0);
   Corpo *c14 = new Corpo(0, 0, 0, 0);
   Corpo *c15 = new Corpo(0, 0, 0, 0);
+  */
 
   ListaDeCorpos *l = new ListaDeCorpos();
 
@@ -41,6 +43,7 @@ int main() {
   l->add_corpo(c3);
   l->add_corpo(c4);
   l->add_corpo(c5);
+  /*
   l->add_corpo(c6);
   l->add_corpo(c7);
   l->add_corpo(c8);
@@ -51,7 +54,7 @@ int main() {
   l->add_corpo(c13);
   l->add_corpo(c14);
   l->add_corpo(c15);
-
+  */
 
   Cliente *cliente = new Cliente();
   if (cliente->initClient()) {

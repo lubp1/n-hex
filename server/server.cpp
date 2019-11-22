@@ -17,6 +17,7 @@ int main (){
   Corpo *c3 = new Corpo(10, 10, rand()%45, rand()%190);
   Corpo *c4 = new Corpo(10, 0, rand()%45, rand()%190);
   Corpo *c5 = new Corpo(-10, 10, rand()%45, rand()%190);
+  /*
   Corpo *c6 = new Corpo(10, 10, rand()%45, rand()%190);
   Corpo *c7 = new Corpo(10, 10, rand()%45, rand()%190);
   Corpo *c8 = new Corpo(10, 10, rand()%45, rand()%190);
@@ -27,6 +28,7 @@ int main (){
   Corpo *c13 = new Corpo(10, -10, rand()%45, rand()%190);
   Corpo *c14 = new Corpo(-10, 10, rand()%45, rand()%190);
   Corpo *c15 = new Corpo(-10, -10, rand()%45, rand()%190);
+  */
 
   // O jogador comeca orbitando
   c1->set_orb(4);
@@ -41,6 +43,7 @@ int main (){
   l->add_corpo(c3);
   l->add_corpo(c4);
   l->add_corpo(c5);
+  /*
   l->add_corpo(c6);
   l->add_corpo(c7);
   l->add_corpo(c8);
@@ -51,7 +54,7 @@ int main (){
   l->add_corpo(c13);
   l->add_corpo(c14);
   l->add_corpo(c15);
-  
+  */
 
 
   Fisica *f = new Fisica(l, mapa);

@@ -828,6 +828,7 @@ void threadServidor(Servidor* server) {
     for (int i = 0; i<MAX_PLAYERS; i++) {
       if (server->getConexaoUsada(i) == 1) {
         if (recv(server->getConnection(i), &keybuffer, 1, MSG_DONTWAIT) != -1) {
+          printf("cleiton\n");
           server->setBuffer(keybuffer); // Atualizando buffer
           server->setBufferID(i); // Atualizando id do caracter enviado
         } else {
@@ -874,6 +875,7 @@ void threadEnviaCorpos(Servidor* server, ListaDeCorpos* l) {
         char mensagem[10000];
         strcpy(mensagem,message.c_str());
         send(server->getConnection(i), &mensagem, 10000, 0);
+        std::this_thread::sleep_for (std::chrono::milliseconds(100));
       }
     }
   }
