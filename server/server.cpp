@@ -67,8 +67,10 @@ int main (){
   Servidor *servidor = new Servidor();
   servidor->initServer();
   // Thread para receber os comandos dos usuarios
-  std::thread newthread(threadServidor, servidor);
-  (servidor->kb_thread).swap(newthread);
+  for(int i = 0; i< MAX_PLAYERS; i++) {
+    std::thread newthread(threadServidor, servidor, i);
+    (servidor->kb_thread[i]).swap(newthread);
+  }
   // Thread que espera a conexão de usuarios
   std::thread newthread2(threadEsperaServidor, servidor);
   (servidor->wait_thread).swap(newthread2);

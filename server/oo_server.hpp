@@ -153,7 +153,7 @@ class Servidor {
   public:
     struct sockaddr_in client;
     socklen_t client_size;
-    std::thread kb_thread, wait_thread, model_thread;
+    std::thread kb_thread[MAX_PLAYERS], wait_thread, model_thread;
 
     Servidor();
     void initServer();
@@ -175,7 +175,7 @@ class Servidor {
     int getJogadores();
 };
 
-void threadServidor(Servidor* server);
+void threadServidor(Servidor* server, int i);
 void threadEsperaServidor(Servidor* server);
 void threadEnviaCorpos(Servidor* server, ListaDeCorpos* l);
 

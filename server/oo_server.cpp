@@ -820,22 +820,18 @@ Tela::~Tela() {
 }
 
 
-// Funcao que roda em uma segunda thread para ouvir os clientes
-void threadServidor(Servidor* server) {
-  char c;
+// Funcao que roda em uma segunda thread para ouvir cada cliente
+void threadServidor(Servidor* server, int id) {
   while (server->getRodando()) {
     char keybuffer;
-    for (int i = 0; i<MAX_PLAYERS; i++) {
-      if (server->getConexaoUsada(i) == 1) {
-        if (recv(server->getConnection(i), &keybuffer, 1, MSG_DONTWAIT) != -1) {
-          server->setBuffer(keybuffer, i); // Atualizando buffer
-        } else {
-          server->setBuffer(0, i);
-        }
+    if (server->getConexaoUsada(id) == 1) {
+      if (recv(server->getConnection(id), &keybuffer, 1, 0)) {
+        server->setBuffer(keybuffer, id); // Atualizando buffer
+      } else {
+        server->setBuffer(0, id);
       }
     }
-
-    std::this_thread::sleep_for (std::chrono::milliseconds(10));
+    std::this_thread::sleep_for (std::chrono::milliseconds(60));
   }
   printf("Saindo da thread de ouvir clientes.\n");
   return;
@@ -925,7 +921,9 @@ void Servidor::endServer() {
 
 
   // Esperando threads
-  (this->kb_thread).join();
+  for(int i = 0; i < MAX_PLAYERS; i++) {
+    (this->kb_thread[i]).join();
+  }
   (this->wait_thread).join();
   (this->model_thread).join();
 

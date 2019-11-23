@@ -645,12 +645,12 @@ void threadEnviaComandos(Cliente* client, Teclado* teclado) {
   while(client->getRodando()) {
     char c = teclado->getchar();
     if(c == ' ' || c == 'q'){
-      if(send(client->getSocket(), &c, 1, 0) == -1) {
+      if((send(client->getSocket(), &c, 1, 0) == -1) || c == 'q') {
+        printw("Pressione qualquer tecla para sair");
         client->setRodando(0);
       }
       send(client->getSocket(), 0, 1, 0);
     }
-    std::this_thread::sleep_for (std::chrono::milliseconds(20));
   }
   
 }
