@@ -452,10 +452,14 @@ void Tela::init() {
   curs_set(0);           /* Do not display cursor */
 
   // Escolhendo indice das cores dos corpos
+  // Escolhendo indice das cores dos corpos
   start_color();
   init_pair(0, COLOR_WHITE, COLOR_BLACK);
   init_pair(1, COLOR_WHITE, COLOR_BLUE);
-  init_pair(2, COLOR_WHITE, COLOR_GREEN);
+  init_pair(2, COLOR_WHITE, COLOR_RED);
+  init_pair(3, COLOR_WHITE, COLOR_YELLOW);
+  init_pair(4, COLOR_WHITE, COLOR_CYAN);
+  init_pair(5, COLOR_WHITE, COLOR_MAGENTA);
 
   // Tamanho do mapa
   this->row = 50;
@@ -641,8 +645,9 @@ void threadEnviaComandos(Cliente* client, Teclado* teclado) {
   while(client->getRodando()) {
     char c = teclado->getchar();
     if(c == ' ' || c == 'q'){
-      printw("cleiton");
-      send(client->getSocket(), &c, 1, 0);
+      if(send(client->getSocket(), &c, 1, 0) == -1) {
+        client->setRodando(0);
+      }
       send(client->getSocket(), 0, 1, 0);
     }
     std::this_thread::sleep_for (std::chrono::milliseconds(20));

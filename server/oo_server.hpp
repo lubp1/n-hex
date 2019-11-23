@@ -144,8 +144,7 @@ class Servidor {
     int connection_fd[MAX_PLAYERS];
     int conexao_usada[MAX_PLAYERS];
     struct sockaddr_in myself;
-    char input_buffer;
-    int input_buffer_id;
+    char* input_buffer;
     int rodando;
     int jogadores;
     int jogador_vivo[MAX_PLAYERS]; // 0 = jogador nao logado, 1 = jogador vivo, -1 = jogador morto
@@ -159,10 +158,8 @@ class Servidor {
     Servidor();
     void initServer();
     void endServer();
-    void setBuffer(char buffer);
-    char getBuffer();
-    void setBufferID(int id);
-    char getBufferID();
+    void setBuffer(char buffer, int pos);
+    char getBuffer(int pos);
     void setRodando(int rodando);
     int  getRodando();
     void setConnection(int connection, int pos);

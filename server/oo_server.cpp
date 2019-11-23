@@ -518,20 +518,20 @@ int Fisica::update(float deltaT, int tamTela) {
             float velYi = (*c)[i]->get_velY();
             float velXj = (*c)[j]->get_velX();
             float velYj = (*c)[j]->get_velY();
-            if(!(*c)[i]->get_jogador()) { // Se nao eh jogador
+            if((*c)[i]->get_jogador()) { // Se eh jogador
               if(!(*c)[j]->get_cor()) { // Se for um corpo neutro
                 (*c)[j]->set_cor((*c)[i]->get_cor());
               }
               else if ((*c)[j]->get_cor() != (*c)[i]->get_cor()) { // Se colidiu com uma bola inimiga
-                return 1;
+                return i + 1;
               }
             }
-            if(!(*c)[j]->get_jogador()) {
+            if((*c)[j]->get_jogador()) { // Se eh jogador
               if(!(*c)[i]->get_cor()) { // Se for um corpo neutro
                 (*c)[i]->set_cor((*c)[j]->get_cor());
               }
               else if ((*c)[i]->get_cor() != (*c)[j]->get_cor()) { // Se colidiu com uma bola inimiga
-                return 1;
+                return j + 1;
               }
             }
             // Troca as velocidades dos dois corpos
@@ -828,11 +828,9 @@ void threadServidor(Servidor* server) {
     for (int i = 0; i<MAX_PLAYERS; i++) {
       if (server->getConexaoUsada(i) == 1) {
         if (recv(server->getConnection(i), &keybuffer, 1, MSG_DONTWAIT) != -1) {
-          printf("cleiton\n");
-          server->setBuffer(keybuffer); // Atualizando buffer
-          server->setBufferID(i); // Atualizando id do caracter enviado
+          server->setBuffer(keybuffer, i); // Atualizando buffer
         } else {
-          server->setBuffer(0);
+          server->setBuffer(0, i);
         }
       }
     }
@@ -874,7 +872,14 @@ void threadEnviaCorpos(Servidor* server, ListaDeCorpos* l) {
       if(server->getConexaoUsada(i)) {
         char mensagem[10000];
         strcpy(mensagem,message.c_str());
-        send(server->getConnection(i), &mensagem, 10000, 0);
+        if (send(server->getConnection(i), &mensagem, 10000, 0) == -1) { // Se nao foi possivel mandar a mensagem (Cliente desconectou)
+          server->setConnection(0, i);
+          server->setConexaoUsada(0,i);
+          server->removeJogador();
+          if (!server->getJogadores()) { // Se nao ha mais jogadores
+            server->setRodando(0);
+          }
+        }
         std::this_thread::sleep_for (std::chrono::milliseconds(100));
       }
     }
@@ -886,6 +891,7 @@ void threadEnviaCorpos(Servidor* server, ListaDeCorpos* l) {
 
 Servidor::Servidor() {
   this->jogadores = 0;
+  this->input_buffer = (char *)malloc(MAX_PLAYERS * sizeof(char));
 }
 
 void Servidor::initServer() {
@@ -900,7 +906,7 @@ void Servidor::initServer() {
 
   (this->myself).sin_family = AF_INET;
   (this->myself).sin_port = htons(3001);
-  inet_aton("192.168.0.50", &((this->myself).sin_addr));
+  inet_aton("127.0.0.1", &((this->myself).sin_addr));
 
 
   if (bind(this->socket_fd, (struct sockaddr*)&(this->myself), sizeof(this->myself)) != 0) {
@@ -941,19 +947,11 @@ void Servidor::removeJogador() {
 int Servidor::getJogadores() {
   return this->jogadores;
 }
-void Servidor::setBuffer(char buffer) {
-  this->input_buffer = buffer;
+void Servidor::setBuffer(char buffer, int pos) {
+  this->input_buffer[pos] = buffer;
 }
-char Servidor::getBuffer() {
-  char c = this->input_buffer;
-  this->input_buffer = 0;
-  return c;
-}
-void Servidor::setBufferID(int id) {
-  this->input_buffer_id = id;
-}
-char Servidor::getBufferID() {
-  return this->input_buffer_id;
+char Servidor::getBuffer(int pos) {
+  return this->input_buffer[pos];
 }
 void Servidor::setRodando(int rodando) {
   this->rodando = rodando;

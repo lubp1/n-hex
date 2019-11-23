@@ -90,12 +90,13 @@ int main (){
   int tela_pequena = 0; // Marca se a tela eh menor que o suportado pelo jogo
   int ganhou = 0;
 
-  // Colorindo os jogadores
-  for(int i = 0; i<servidor->getJogadores(); i++) {
-    l->get_corpos()->at(i)->set_cor(i+1);
-  }
 
   while (1) {
+    // Colorindo os jogadores
+    for(int i = 0; i<servidor->getJogadores(); i++) {
+      l->get_corpos()->at(i)->set_cor(i+1);
+      l->get_corpos()->at(i)->set_jogador(1);
+    }
 
 
     // Atualiza timers
@@ -116,16 +117,19 @@ int main (){
 
 
     // Lê o teclado
-    char c = servidor->getBuffer();
-    int id = servidor->getBufferID();
+    for (int i = 0; i < servidor->getJogadores(); i++) {
+      char c = servidor->getBuffer(i);
+      if (c==' ') {
+        f->impulso(i);
+      } else if (c=='q' || c=='Q') {
+        printf("Recebido comando para terminar.\n");
+        goto fim;
+      } else if (!servidor->getRodando()) {
+        printf("Todos os clientes desconectados.\n");
+        goto fim;
+      }
+    }
 
-    if (c==' ') {
-      f->impulso(id);
-    }
-    else if (c=='q' || c=='Q') {
-      printf("Recebido comando para terminar.\n");
-      break;
-    }
 
     // Condicao de parada
     if ( (t1-T) > 1000000 ) break;
@@ -133,7 +137,7 @@ int main (){
     std::this_thread::sleep_for (std::chrono::milliseconds(100));
     i++;
   }
-
+fim:
   servidor->endServer();
   //tela->stop();
   printf("Servidor fechado.\n");

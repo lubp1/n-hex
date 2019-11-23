@@ -99,9 +99,10 @@ int main() {
      // Atualiza tela
     tela_pequena = tela->update();
       
-    if(teclado->getchar() == 'q') {
+    if(teclado->getchar() == 'q' || !cliente->getRodando()) {
       break;
     }
+
 
     std::this_thread::sleep_for (std::chrono::milliseconds(100));
   }
