@@ -13,8 +13,8 @@ void threadTeclado(char *keybuffer, int *control) {
   char c;
   while ((*control) == 1) {
     c = getch();
-    if (c!=ERR) (*keybuffer) = c;
-    else (*keybuffer) = 0;
+    if (c!=ERR)     (*keybuffer) = c;
+    else            (*keybuffer) = 0;
     std::this_thread::sleep_for (std::chrono::milliseconds(10));
   }
   return;
