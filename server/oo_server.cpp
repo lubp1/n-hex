@@ -887,7 +887,7 @@ void threadEnviaCorpos(Servidor* server, ListaDeCorpos* l) {
 
 Servidor::Servidor() {
   this->jogadores = 0;
-  this->input_buffer = (char *)calloc(MAX_PLAYERS, sizeof(char));
+  this->input_buffer = (char *)malloc(MAX_PLAYERS * sizeof(char));
 }
 
 void Servidor::initServer() {
@@ -949,9 +949,7 @@ void Servidor::setBuffer(char buffer, int pos) {
   this->input_buffer[pos] = buffer;
 }
 char Servidor::getBuffer(int pos) {
-  char c = this->input_buffer[pos];
-  this->input_buffer[pos] = 0;
-  return c;
+  return this->input_buffer[pos];
 }
 void Servidor::setRodando(int rodando) {
   this->rodando = rodando;
