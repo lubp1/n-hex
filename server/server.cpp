@@ -93,26 +93,26 @@ int main (){
   int ganhou = 0;
   std::vector<int> startCheck(MAX_PLAYERS, 0);
 
-  // Espera todos os jogadores confirmarem o inicio do jogo
-  while( accumulate(startCheck.begin(),startCheck.end(),0) < servidor->getJogadores() || servidor->getJogadores() == 0 ){
+  // // Espera todos os jogadores confirmarem o inicio do jogo
+  // while( accumulate(startCheck.begin(),startCheck.end(),0) < servidor->getJogadores() || servidor->getJogadores() == 0 ){
 
-    for (int i = 0; i < servidor->getJogadores(); i++) {      
-        char c = servidor->getBuffer(i);
-        if (c==' ') {
-          startCheck[i] = 1;
-        } 
-    } 
-  }
+  //   for (int i = 0; i < servidor->getJogadores(); i++) {      
+  //       char c = servidor->getBuffer(i);
+  //       if (c==' ') {
+  //         startCheck[i] = 1;
+  //       } 
+  //   } 
+  // }
+
+
+  while (1) {
+    
 
   // Colorindo os jogadores
     for(int i = 0; i<servidor->getJogadores(); i++) {
       l->get_corpos()->at(i)->set_cor(i+1);
       l->get_corpos()->at(i)->set_jogador(1);
     }
-
-  while (1) {
-    
-
 
     // Atualiza timers
     t0 = t1;
