@@ -67,9 +67,10 @@ int main() {
   Tela *tela = new Tela(l, 20, 20, 20, 20, mapa);
   tela->init();
 
+  /*
   Teclado *teclado = new Teclado();
   teclado->init();
-
+  */
 
   uint64_t t0;
   uint64_t t1;
@@ -87,29 +88,23 @@ int main() {
   std::thread newthread(threadCorpos, cliente, l);
   (cliente->corpos_thread).swap(newthread);
   // Criando thread para enviar comandos para o servidor
-  std::thread newthread2(threadEnviaComandos, cliente, teclado);
+  std::thread newthread2(threadEnviaComandos, cliente);
   (cliente->kb_thread).swap(newthread2);
 
   while (1) {
-    // Atualiza timers
-    t0 = t1;
-    t1 = get_now_ms();
-    deltaT = t1-t0;
-
-     // Atualiza tela
-    tela_pequena = tela->update();
       
-    if(teclado->getchar() == 'q' || !cliente->getRodando()) {
+    if(!cliente->getRodando()) {
       break;
     }
 
 
-    std::this_thread::sleep_for (std::chrono::milliseconds(80));
+    std::this_thread::sleep_for (std::chrono::milliseconds(20));
   }
 
-  cliente->endClient();
-  teclado->stop();
+
+  //teclado->stop();
   tela->stop();
+  cliente->endClient();
 
 
   if(ganhou) {

@@ -82,6 +82,8 @@ int main (){
 
   int i = 0;
 
+
+  // Esperando todos os jogadores conectarem ou todos os conectados estarem prontos
   while(1) {
     for (int i = 0; i < servidor->getJogadores(); i++) {
       char c = servidor->getBuffer(i);
@@ -105,7 +107,7 @@ int main (){
       servidor->setJogadorVivo(1, i);
       l->get_corpos()->at(i)->set_cor(i+1);
       l->get_corpos()->at(i)->set_jogador(1);
-      l->get_corpos()->at(i)->set_orb(i+1);
+      l->get_corpos()->at(i)->set_orb(4);
       l->get_corpos()->at(i)->set_rot('a');
     }
   }
@@ -127,9 +129,12 @@ int main (){
     deltaT = t1-t0;
 
 
+
     // Atualiza modelo
-    if (f->update(deltaT, 50)) {
-      break;
+    int jogador_morto = f->update(deltaT, 50) - 1; // retorna o numero + 1 de um jogador que tenha morrido, 0 caso nenhum tenha 
+    if (jogador_morto != -1) {
+      servidor->removeJogador();
+      servidor->setJogadorVivo(-1,jogador_morto);
     }
 
     /*
@@ -156,7 +161,7 @@ int main (){
     // Condicao de parada
     if ( (t1-T) > 1000000 ) break;
 
-    std::this_thread::sleep_for (std::chrono::milliseconds(80));
+    std::this_thread::sleep_for (std::chrono::milliseconds(100));
     i++;
   }
 fim:

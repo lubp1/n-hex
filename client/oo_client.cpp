@@ -15,7 +15,7 @@ void threadTeclado(char *keybuffer, int *control) {
     c = getch();
     if (c!=ERR)     (*keybuffer) = c;
     else            (*keybuffer) = 0;
-    std::this_thread::sleep_for (std::chrono::milliseconds(20));
+    std::this_thread::sleep_for (std::chrono::milliseconds(10));
   }
   return;
 }
@@ -36,9 +36,11 @@ void Teclado::init() {
 	noecho();			         /* Don't echo() while we do getch */
   curs_set(0);           /* Do not display cursor */
 
+  /*
   this->rodando = 1;
   std::thread newthread(threadTeclado, &(this->ultima_captura), &(this->rodando));
   (this->kb_thread).swap(newthread);
+  */
 }
 
 void Teclado::stop() {
@@ -431,13 +433,92 @@ Mapa::~Mapa() {
 }
 
 
+// Thread que atualiza a tela
+void threadTela(ListaDeCorpos* l, Mapa* mapa, int *control) {
+  while((*control) == 1) {
+    // Limpando a tela
+    erase();
+
+    // Imprimindo bordas
+    int i;
+    for (i=0;i<201;i++) {
+      move(0,i);
+      echochar('-');
+      move(50,  i);
+      echochar('-');
+    }
+    move (51,10);
+    printw("s - pronto para iniciar, espaco - impulso e entrar em orbita, q para sair do jogo");
+    for (i=0;i<51;i++) {
+      move(i,0);
+      echochar('|');
+      move(i,201);
+      echochar('|');
+    }
+
+    // Imprimindo os hexagonos
+    int* hexX = mapa->get_listaX();
+    int* hexY = mapa->get_listaY();
+    for (i=0;i<8; i++) {
+
+      //Centro do hexagono
+      move(hexX[i],hexY[i]);
+      echochar('.');
+
+      // Lados inclinados
+      int j;
+      for (j=0;j<4;j++) {
+        move(hexX[i]-j,hexY[i]-8+j);
+        echochar('/');
+        move(hexX[i]-j,hexY[i]+8-j);
+        echochar('\\');
+        move(hexX[i]+1+j,hexY[i]-8+j);
+        echochar('\\');
+        move(hexX[i]+1+j,hexY[i]+8-j);
+        echochar('/');
+      }
+
+      // Lados retos
+      for(j=0;j<9;j++) {
+        move(hexX[i]-4,hexY[i]-4+j);
+        echochar('_');
+        move(hexX[i]+4,hexY[i]-4+j);
+        echochar('_');
+      }
+    }
+    // Desenha corpos na tela
+    std::vector<Corpo *> *corpos = l->get_corpos();
+
+    for (int k=0; k<corpos->size(); k++) {
+
+      int x_pos = (int) ((*corpos)[k]->get_posX());
+      int y_pos = (int) ((*corpos)[k]->get_posY());
+
+      if ((*corpos)[k]->get_jogador()) { // Jogador
+        move(x_pos, y_pos);
+        attron(COLOR_PAIR((*corpos)[k]->get_cor()));
+        echochar('*');
+        attroff(COLOR_PAIR((*corpos)[k]->get_cor()));
+      } else { // Outros corpos
+        move(x_pos, y_pos);
+        attron(COLOR_PAIR((*corpos)[k]->get_cor()));
+        echochar('o');
+        attroff(COLOR_PAIR((*corpos)[k]->get_cor()));
+      }
+      
+    }
+
+    // Atualiza tela
+    refresh();
+    std::this_thread::sleep_for (std::chrono::milliseconds(120));
+  }
+}
+
 
 // Classe Tela
 
 Tela::Tela(ListaDeCorpos *ldc, int maxI, int maxJ, float maxX, float maxY, Mapa* mapa) {
   this->lista = ldc;
-  this->lista_anterior = new ListaDeCorpos();
-  this->lista_anterior->copy(this->lista);
   this->maxI = maxI;
   this->maxJ = maxJ;
   this->maxX = maxX;
@@ -465,56 +546,15 @@ void Tela::init() {
   this->row = 50;
   this->col = 200;
 
-  // Limpando a tela
-  erase();
+  raw();				         /* Line buffering disabled	*/
+	keypad(stdscr, TRUE);	 /* We get F1, F2 etc..		*/
+	noecho();			         /* Don't echo() while we do getch */
+  curs_set(0);           /* Do not display cursor */
 
-  // Imprimindo bordas
-  int i;
-  for (i=0;i<201;i++) {
-    move(0,i);
-    echochar('-');
-    move(50,  i);
-    echochar('-');
-  }
-  move (51,10);
-  printw("s - pronto para iniciar, espaco - impulso e entrar em orbita, q para sair do jogo");
-  for (i=0;i<51;i++) {
-    move(i,0);
-    echochar('|');
-    move(i,201);
-    echochar('|');
-  }
 
-  // Imprimindo os hexagonos
-  int* hexX = this->mapa->get_listaX();
-  int* hexY = this->mapa->get_listaY();
-  for (i=0;i<8; i++) {
-
-    //Centro do hexagono
-    move(hexX[i],hexY[i]);
-    echochar('.');
-
-    // Lados inclinados
-    int j;
-    for (j=0;j<4;j++) {
-      move(hexX[i]-j,hexY[i]-8+j);
-      echochar('/');
-      move(hexX[i]-j,hexY[i]+8-j);
-      echochar('\\');
-      move(hexX[i]+1+j,hexY[i]-8+j);
-      echochar('\\');
-      move(hexX[i]+1+j,hexY[i]+8-j);
-      echochar('/');
-    }
-
-    // Lados retos
-    for(j=0;j<9;j++) {
-      move(hexX[i]-4,hexY[i]-4+j);
-      echochar('_');
-      move(hexX[i]+4,hexY[i]-4+j);
-      echochar('_');
-    }
-  }
+  this->rodando = 1;
+  std::thread newthread(threadTela, this->lista, this->mapa, &(this->rodando));
+  (this->tela_thread).swap(newthread);
 
 }
 
@@ -529,97 +569,13 @@ int Tela::getCols(){
 // Funcao que atualiza a tela a cada iteracao, retorna 1 se a tela eh menor do que o necessario e 0 caso contrario
 int Tela::update() {
 
-  int x_pos, y_pos;
-  getmaxyx(stdscr, this->row, this->col);
-
-  // Se a tela eh pequena demais
-  if(this->row < MAX_X || this->col < MAX_Y){
-    erase();
-    move(row/2, col/2);
-    printw("Aumente a tela e reinicie o jogo, aperte 'q' para sair");
-    std::this_thread::sleep_for (std::chrono::seconds(1));
-    return 1;
-  }
-
-  std::vector<Corpo *> *corpos_old = this->lista_anterior->get_corpos();
-
-  //Apaga corpos na tela
-  for (int k=0; k<corpos_old->size(); k++){
-
-    x_pos = (int) ((*corpos_old)[k]->get_posX());
-    y_pos = (int) ((*corpos_old)[k]->get_posY());
-
-
-    move(x_pos, y_pos);   /* Move cursor to position */
-    echochar(' ');  /* Prints character, advances a position */
-
-    // Reimprimindo o hexagono mais proximo, para caso ele tenha sido apagado
-    int hex = this->mapa->buscaHex(x_pos, y_pos);
-    int* hexX = this->mapa->get_listaX();
-    int* hexY = this->mapa->get_listaY();
-
-    if (abs(hexX[hex]-x_pos) < 9 && abs(hexY[hex]-y_pos) < 9) {
-      //Centro do hexagono
-      move(hexX[hex],hexY[hex]);
-      echochar('.');
-
-      // Lados inclinados
-      int j;
-      for (j=0;j<4;j++) {
-        move(hexX[hex]-j,hexY[hex]-8+j);
-        echochar('/');
-        move(hexX[hex]-j,hexY[hex]+8-j);
-        echochar('\\');
-        move(hexX[hex]+1+j,hexY[hex]-8+j);
-        echochar('\\');
-        move(hexX[hex]+1+j,hexY[hex]+8-j);
-        echochar('/');
-      }
-
-      // Lados retos
-      for(j=0;j<9;j++) {
-        move(hexX[hex]-4,hexY[hex]-4+j);
-        echochar('_');
-        move(hexX[hex]+4,hexY[hex]-4+j);
-        echochar('_');
-      }
-    }
-  }
-
-  // Desenha corpos na tela
-  std::vector<Corpo *> *corpos = this->lista->get_corpos();
-
-  for (int k=0; k<corpos->size(); k++) {
-
-    x_pos = (int) ((*corpos)[k]->get_posX());
-    y_pos = (int) ((*corpos)[k]->get_posY());
-
-    if ((*corpos)[k]->get_jogador()) { // Jogador
-      move(x_pos, y_pos);
-      attron(COLOR_PAIR((*corpos)[k]->get_cor()));
-      echochar('*');
-      attroff(COLOR_PAIR((*corpos)[k]->get_cor()));
-    } else { // Outros corpos
-      move(x_pos, y_pos);
-      attron(COLOR_PAIR((*corpos)[k]->get_cor()));
-      echochar('o');
-      attroff(COLOR_PAIR((*corpos)[k]->get_cor()));
-    }
-
-    // Atualiza corpos antigos
-    if (corpos->size() == corpos_old->size()) { // Se nao tem corpos novos
-      (*corpos_old)[k]->update((*corpos)[k]->get_velX(), (*corpos)[k]->get_velY(), (*corpos)[k]->get_posX(), (*corpos)[k]->get_posY());
-    } else { // Se tem corpos novos
-      this->lista_anterior->copy(this->lista);
-    }
-  }
-
-  // Atualiza tela
-  refresh();
+  
   return 0;
 }
 
 void Tela::stop() {
+  this->rodando = 0;
+  (this->tela_thread).join();
   endwin();
 }
 
@@ -643,16 +599,19 @@ void threadCorpos(Cliente* client, ListaDeCorpos* l) {
 }
 
 // Thread que envia os comandos do teclado
-void threadEnviaComandos(Cliente* client, Teclado* teclado) {
+void threadEnviaComandos(Cliente* client) {
   while(client->getRodando()) {
-    char c = teclado->getchar();
+    char c = getch();
     if(c == ' ' || c == 'q' || c == 's'){
       if((send(client->getSocket(), &c, 1, 0) == -1) || c == 'q') {
         printw("Pressione qualquer tecla para sair");
         client->setRodando(0);
+        send(client->getSocket(), 0, 1, 0);
+      } else {
+        send(client->getSocket(), 0, 1, 0);
       }
-      send(client->getSocket(), 0, 1, 0);
     }
+    std::this_thread::sleep_for (std::chrono::milliseconds(10));
   }
   
 }

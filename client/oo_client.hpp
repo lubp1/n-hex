@@ -123,14 +123,19 @@ class Mapa {
 };
 
 
+// Funcao que roda em outra thread para atualizar a tela
+void threadTela(ListaDeCorpos* l, Mapa* mapa, int *control);
+
 // Classe que imprime o mapa e corpos na tela
 class Tela {
   private:
-    ListaDeCorpos *lista, *lista_anterior;
+    ListaDeCorpos *lista;
     int maxI, maxJ;
     float maxX, maxY;
     int row, col;
-    Mapa* mapa;
+    Mapa* mapa;    
+    int rodando;
+    std::thread tela_thread;
 
 
   public:
@@ -176,7 +181,7 @@ class Cliente {
 };
 
 void threadCorpos(Cliente* client, ListaDeCorpos* l);
-void threadEnviaComandos(Cliente* client, Teclado* teclado);
+void threadEnviaComandos(Cliente* client);
 
 
 #endif

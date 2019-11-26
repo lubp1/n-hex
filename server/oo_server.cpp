@@ -831,7 +831,7 @@ void threadServidor(Servidor* server, int id) {
         server->setBuffer(0, id);
       }
     }
-    std::this_thread::sleep_for (std::chrono::milliseconds(60));
+    std::this_thread::sleep_for (std::chrono::milliseconds(50));
   }
   printf("Saindo da thread de ouvir clientes.\n");
   return;
@@ -874,13 +874,17 @@ void threadEnviaCorpos(Servidor* server, ListaDeCorpos* l) {
     for(int i = 0; i < MAX_PLAYERS; i++) {
       if(server->getConexaoUsada(i)) {
         char mensagem[10000];
-        strcpy(mensagem,message.c_str());
-        if (send(server->getConnection(i), &mensagem, 10000, 0) == -1) { // Se nao foi possivel mandar a mensagem (Cliente desconectou)
+        if (server->getJogadorVivo(i) == -1) { // Se o jogador perdeu
+          send(server->getConnection(i), "p", 10000, 0);
           server->setConnection(0, i);
           server->setConexaoUsada(0,i);
           server->removeJogador();
-          if (!server->getJogadores()) { // Se nao ha mais jogadores
-            server->setRodando(0);
+        } else {
+         strcpy(mensagem,message.c_str());
+          if (send(server->getConnection(i), &mensagem, 10000, 0) == -1) { // Se nao foi possivel mandar a mensagem (Cliente desconectou)
+            server->setConnection(0, i);
+            server->setConexaoUsada(0,i);
+            server->removeJogador();
           }
         }
         std::this_thread::sleep_for (std::chrono::milliseconds(100));
