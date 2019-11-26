@@ -15,7 +15,7 @@ void threadTeclado(char *keybuffer, int *control) {
     c = getch();
     if (c!=ERR)     (*keybuffer) = c;
     else            (*keybuffer) = 0;
-    std::this_thread::sleep_for (std::chrono::milliseconds(10));
+    std::this_thread::sleep_for (std::chrono::milliseconds(20));
   }
   return;
 }
@@ -630,10 +630,10 @@ Tela::~Tela() {
 
 // Funcao que roda em uma outra thread para receber os dados do servidor
 void threadCorpos(Cliente* client, ListaDeCorpos* l) {
-  char reply[100000];
+  char reply[10000];
   int msg_len;
   while(client->getRodando() == 1) {
-    msg_len = recv(client->getSocket(), reply, 100000, MSG_DONTWAIT);
+    msg_len = recv(client->getSocket(), reply, 10000, MSG_DONTWAIT);
     if (msg_len > 10) {
       std::string data(reply);
       if (data.length() > 1)

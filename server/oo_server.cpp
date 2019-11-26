@@ -898,7 +898,7 @@ Servidor::Servidor() {
 }
 
 void Servidor::initServer() {
-  printf("Iniciando servidor\n");
+  
   this->client_size = (socklen_t)sizeof(this->client);
   for (int i=0; i<MAX_PLAYERS; i++) {
     this->conexao_usada[i] = 0;
@@ -913,8 +913,7 @@ void Servidor::initServer() {
   printf("Insira o seu ip:");
   scanf("%s", ip);
   inet_aton(ip, &((this->myself).sin_addr));
-
-
+  
   if (bind(this->socket_fd, (struct sockaddr*)&(this->myself), sizeof(this->myself)) != 0) {
     return;
   }
@@ -922,6 +921,7 @@ void Servidor::initServer() {
   listen(this->socket_fd, 2);
 
   this->rodando = 1;
+  printf("Servidor iniciado!\n");
 }
 
 

@@ -82,10 +82,6 @@ int main (){
 
   int i = 0;
 
-
-
-
-
   while(1) {
     for (int i = 0; i < servidor->getJogadores(); i++) {
       char c = servidor->getBuffer(i);
@@ -160,7 +156,7 @@ int main (){
     // Condicao de parada
     if ( (t1-T) > 1000000 ) break;
 
-    std::this_thread::sleep_for (std::chrono::milliseconds(100));
+    std::this_thread::sleep_for (std::chrono::milliseconds(80));
     i++;
   }
 fim:
