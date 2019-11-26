@@ -87,10 +87,7 @@ int main (){
 
   int i = 0;
 
-  T = get_now_ms();
-  t1 = T;
-  int tela_pequena = 0; // Marca se a tela eh menor que o suportado pelo jogo
-  int ganhou = 0;
+
 
 
 
@@ -99,7 +96,7 @@ int main (){
       char c = servidor->getBuffer(i);
       if (c=='s') {
         servidor->setJogadorVivo(2,i);
-        printf("ola\n");
+        printf("Jogador %d está pronto.\n", i);
       }
     }
     int acumulador = 0;
@@ -107,19 +104,24 @@ int main (){
       acumulador += servidor->getJogadorVivo(i);
     }
     if (acumulador == 2*servidor->getJogadores() && servidor->getJogadores() > 0) {
+      for(int i = 0; i < MAX_PLAYERS; i++) {
+        if(servidor->getJogadorVivo(i)) {
+          // Colorindo jogadores e marcando como vivos
+          servidor->setJogadorVivo(1, i);
+          l->get_corpos()->at(i)->set_cor(i+1);
+          l->get_corpos()->at(i)->set_jogador(1);
+        }
+      } 
       break;
     }
-    std::this_thread::sleep_for (std::chrono::milliseconds(10));
   }
   (servidor->wait_thread).join();
 
+  T = get_now_ms();
+  t1 = T;
+
 
   while (1) {
-    // Colorindo os jogadores
-    for(int i = 0; i<servidor->getJogadores(); i++) {
-      l->get_corpos()->at(i)->set_cor(i+1);
-      l->get_corpos()->at(i)->set_jogador(1);
-    }
 
 
     // Atualiza timers
