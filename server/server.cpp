@@ -18,16 +18,16 @@ int main (){
   Corpo *c4 = new Corpo(10, 0, rand()%45, rand()%190);
   Corpo *c5 = new Corpo(-10, 10, rand()%45, rand()%190);
   /*
-  Corpo *c6 = new Corpo(10, 10, rand()%45, rand()%190);
-  Corpo *c7 = new Corpo(10, 10, rand()%45, rand()%190);
-  Corpo *c8 = new Corpo(10, 10, rand()%45, rand()%190);
-  Corpo *c9 = new Corpo(10, 10, rand()%45, rand()%190);
-  Corpo *c10 = new Corpo(10, 10, rand()%45, rand()%190);
-  Corpo *c11 = new Corpo(10, 10, rand()%45, rand()%190);
-  Corpo *c12 = new Corpo(-10, 10, rand()%45, rand()%190);
-  Corpo *c13 = new Corpo(10, -10, rand()%45, rand()%190);
-  Corpo *c14 = new Corpo(-10, 10, rand()%45, rand()%190);
-  Corpo *c15 = new Corpo(-10, -10, rand()%45, rand()%190);
+    Corpo *c6 = new Corpo(10, 10, rand()%45, rand()%190);
+    Corpo *c7 = new Corpo(10, 10, rand()%45, rand()%190);
+    Corpo *c8 = new Corpo(10, 10, rand()%45, rand()%190);
+    Corpo *c9 = new Corpo(10, 10, rand()%45, rand()%190);
+    Corpo *c10 = new Corpo(10, 10, rand()%45, rand()%190);
+    Corpo *c11 = new Corpo(10, 10, rand()%45, rand()%190);
+    Corpo *c12 = new Corpo(-10, 10, rand()%45, rand()%190);
+    Corpo *c13 = new Corpo(10, -10, rand()%45, rand()%190);
+    Corpo *c14 = new Corpo(-10, 10, rand()%45, rand()%190);
+    Corpo *c15 = new Corpo(-10, -10, rand()%45, rand()%190);
   */
 
   // O jogador comeca orbitando
@@ -44,16 +44,16 @@ int main (){
   l->add_corpo(c4);
   l->add_corpo(c5);
   /*
-  l->add_corpo(c6);
-  l->add_corpo(c7);
-  l->add_corpo(c8);
-  l->add_corpo(c9);
-  l->add_corpo(c10);
-  l->add_corpo(c11);
-  l->add_corpo(c12);
-  l->add_corpo(c13);
-  l->add_corpo(c14);
-  l->add_corpo(c15);
+    l->add_corpo(c6);
+    l->add_corpo(c7);
+    l->add_corpo(c8);
+    l->add_corpo(c9);
+    l->add_corpo(c10);
+    l->add_corpo(c11);
+    l->add_corpo(c12);
+    l->add_corpo(c13);
+    l->add_corpo(c14);
+    l->add_corpo(c15);
   */
 
 
@@ -91,28 +91,15 @@ int main (){
   t1 = T;
   int tela_pequena = 0; // Marca se a tela eh menor que o suportado pelo jogo
   int ganhou = 0;
-  std::vector<int> startCheck(MAX_PLAYERS, 0);
-
-  // // Espera todos os jogadores confirmarem o inicio do jogo
-  // while( accumulate(startCheck.begin(),startCheck.end(),0) < servidor->getJogadores() || servidor->getJogadores() == 0 ){
-
-  //   for (int i = 0; i < servidor->getJogadores(); i++) {      
-  //       char c = servidor->getBuffer(i);
-  //       if (c==' ') {
-  //         startCheck[i] = 1;
-  //       } 
-  //   } 
-  // }
 
 
   while (1) {
-    
-
-  // Colorindo os jogadores
+    // Colorindo os jogadores
     for(int i = 0; i<servidor->getJogadores(); i++) {
       l->get_corpos()->at(i)->set_cor(i+1);
       l->get_corpos()->at(i)->set_jogador(1);
     }
+
 
     // Atualiza timers
     t0 = t1;

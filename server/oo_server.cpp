@@ -887,7 +887,7 @@ void threadEnviaCorpos(Servidor* server, ListaDeCorpos* l) {
 
 Servidor::Servidor() {
   this->jogadores = 0;
-  this->input_buffer = (char *)malloc(MAX_PLAYERS * sizeof(char));
+  this->input_buffer = (char *)calloc(MAX_PLAYERS, sizeof(char));
 }
 
 void Servidor::initServer() {
@@ -902,7 +902,7 @@ void Servidor::initServer() {
 
   (this->myself).sin_family = AF_INET;
   (this->myself).sin_port = htons(3001);
-  inet_aton("127.0.0.1", &((this->myself).sin_addr));
+  inet_aton("192.168.0.49", &((this->myself).sin_addr));
 
 
   if (bind(this->socket_fd, (struct sockaddr*)&(this->myself), sizeof(this->myself)) != 0) {
@@ -949,7 +949,9 @@ void Servidor::setBuffer(char buffer, int pos) {
   this->input_buffer[pos] = buffer;
 }
 char Servidor::getBuffer(int pos) {
-  return this->input_buffer[pos];
+  char c = this->input_buffer[pos];
+  this->input_buffer[pos] = 0;
+  return c;
 }
 void Servidor::setRodando(int rodando) {
   this->rodando = rodando;
