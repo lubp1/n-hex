@@ -827,6 +827,13 @@ void threadServidor(Servidor* server, int id) {
     if (server->getConexaoUsada(id) == 1) {
       if (recv(server->getConnection(id), &keybuffer, 1, 0)) {
         server->setBuffer(keybuffer, id); // Atualizando buffer
+        if (keybuffer == 'q') {
+          printf("Jogador %d saiu.\n", id);
+          send(server->getConnection(id), "q", 2, 0);
+          server->setConnection(0, id);
+          server->setConexaoUsada(0,id);
+          server->removeJogador();
+        }
       } else {
         server->setBuffer(0, id);
       }
@@ -874,8 +881,16 @@ void threadEnviaCorpos(Servidor* server, ListaDeCorpos* l) {
     for(int i = 0; i < MAX_PLAYERS; i++) {
       if(server->getConexaoUsada(i)) {
         char mensagem[10000];
-        if (server->getJogadorVivo(i) == -1) { // Se o jogador perdeu
-          send(server->getConnection(i), "p", 10000, 0);
+        if (server->getJogadores() == 1) { // Se for o unico jogador, ele ganhou
+          printf("Jogador %d ganhou.\n", i);
+          send(server->getConnection(i), "g", 2, 0);
+          server->setConnection(0, i);
+          server->setConexaoUsada(0,i);
+          server->removeJogador();
+          server->setRodando(0);
+        } else if (server->getJogadorVivo(i) == -1) { // Se o jogador perdeu
+          printf("Jogador %d morreu.\n", i);
+          send(server->getConnection(i), "p", 2, 0);
           server->setConnection(0, i);
           server->setConexaoUsada(0,i);
           server->removeJogador();
@@ -887,9 +902,9 @@ void threadEnviaCorpos(Servidor* server, ListaDeCorpos* l) {
             server->removeJogador();
           }
         }
-        std::this_thread::sleep_for (std::chrono::milliseconds(100));
       }
     }
+    std::this_thread::sleep_for (std::chrono::milliseconds(100));
   }
   printf("Saindo da thread de serializar corpos.\n");
   return;

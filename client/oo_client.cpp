@@ -592,8 +592,14 @@ void threadCorpos(Cliente* client, ListaDeCorpos* l) {
     msg_len = recv(client->getSocket(), reply, 10000, MSG_DONTWAIT);
     if (msg_len > 10) {
       std::string data(reply);
-      if (data.length() > 1)
+      if (data.length() > 1) {
         l->unserialize(data);
+      }
+    } else {
+      if (reply[0] == 'g' || reply[0] == 'p') {
+        client->setGanhou(reply[0]);
+        client->setRodando(0);
+      }
     }
   }
 }
@@ -605,8 +611,9 @@ void threadEnviaComandos(Cliente* client) {
     if(c == ' ' || c == 'q' || c == 's'){
       if((send(client->getSocket(), &c, 1, 0) == -1) || c == 'q') {
         printw("Pressione qualquer tecla para sair");
-        client->setRodando(0);
         send(client->getSocket(), 0, 1, 0);
+        client->setGanhou(0);
+        client->setRodando(0);
       } else {
         send(client->getSocket(), 0, 1, 0);
       }
@@ -637,6 +644,7 @@ int Cliente::initClient() {
     return 1;
   }
   this->rodando = 1;
+  this->ganhou = 0;
   return 0;
 }
 
@@ -658,6 +666,12 @@ char Cliente::getBuffer() {
 }
 void Cliente::setRodando(int rodando) {
   this->rodando = rodando;
+}
+void Cliente::setGanhou(char ganhou) {
+  this->ganhou = ganhou;
+}
+char Cliente::getGanhou() {
+  return this->ganhou;
 }
 int Cliente::getRodando() {
   return this->rodando;

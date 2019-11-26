@@ -104,15 +104,16 @@ int main() {
 
   //teclado->stop();
   tela->stop();
+
+  if(cliente->getGanhou() == 'g') {
+    printf("Parabéns, você ganhou!\n");
+  } else if(cliente->getGanhou() == 'p') {
+    printf("Perdeu!\n");
+  } else {
+    printf("Você saiu do jogo.\n");
+  }
   cliente->endClient();
 
-
-  if(ganhou) {
-    printf("Ganhou\n");
-  }
-  else if(!tela_pequena) {
-    printf("Perdeu!\n");
-  }
 
 
   return 0;

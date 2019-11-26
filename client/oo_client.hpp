@@ -157,6 +157,7 @@ class Cliente {
     char input_buffer;
     int rodando;
     int id;
+    char ganhou; // 0 por padrao, p se perdeu, g se ganhou
     ListaDeCorpos* l;
 
 
@@ -172,6 +173,8 @@ class Cliente {
     char getBuffer();
     void setRodando(int rodando);
     int  getRodando();
+    void setGanhou(char ganhou);
+    char getGanhou();
     void setConnection(int connection);
     int  getConnection();
     void setSocket(int socket);

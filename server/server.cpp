@@ -64,14 +64,14 @@ int main (){
 
   Servidor *servidor = new Servidor();
   servidor->initServer();
+  // Thread que espera a conexão de usuarios
+  std::thread newthread2(threadEsperaServidor, servidor);
+  (servidor->wait_thread).swap(newthread2);
   // Thread para receber os comandos dos usuarios
   for(int i = 0; i< MAX_PLAYERS; i++) {
     std::thread newthread(threadServidor, servidor, i);
     (servidor->kb_thread[i]).swap(newthread);
   }
-  // Thread que espera a conexão de usuarios
-  std::thread newthread2(threadEsperaServidor, servidor);
-  (servidor->wait_thread).swap(newthread2);
 
 
   uint64_t t0;
@@ -148,18 +148,14 @@ int main (){
       char c = servidor->getBuffer(i);
       if (c==' ') {
         f->impulso(i);
-      } else if (c=='q' || c=='Q') {
-        printf("Recebido comando para terminar.\n");
-        goto fim;
-      } else if (!servidor->getRodando()) {
-        printf("Todos os clientes desconectados.\n");
-        goto fim;
       }
     }
 
 
     // Condicao de parada
-    if ( (t1-T) > 1000000 ) break;
+    if (!servidor->getRodando()) {
+      break;
+    }
 
     std::this_thread::sleep_for (std::chrono::milliseconds(100));
     i++;
