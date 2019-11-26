@@ -23,12 +23,12 @@ int main() {
   Corpo *c3 = new Corpo(0, 0, 0, 0);
   Corpo *c4 = new Corpo(0, 0, 0, 0);
   Corpo *c5 = new Corpo(0, 0, 0, 0);
-  /*
   Corpo *c6 = new Corpo(0, 0, 0, 0);
   Corpo *c7 = new Corpo(0, 0, 0, 0);
   Corpo *c8 = new Corpo(0, 0, 0, 0);
   Corpo *c9 = new Corpo(0, 0, 0, 0);
   Corpo *c10 = new Corpo(0, 0, 0, 0);
+  /*
   Corpo *c11 = new Corpo(0, 0, 0, 0);
   Corpo *c12 = new Corpo(0, 0, 0, 0);
   Corpo *c13 = new Corpo(0, 0, 0, 0);
@@ -43,12 +43,12 @@ int main() {
   l->add_corpo(c3);
   l->add_corpo(c4);
   l->add_corpo(c5);
-  /*
   l->add_corpo(c6);
   l->add_corpo(c7);
   l->add_corpo(c8);
   l->add_corpo(c9);
   l->add_corpo(c10);
+  /*
   l->add_corpo(c11);
   l->add_corpo(c12);
   l->add_corpo(c13);

@@ -476,6 +476,8 @@ void Tela::init() {
     move(50,  i);
     echochar('-');
   }
+  move (51,10);
+  printw("s - pronto para iniciar, espaco - impulso e entrar em orbita, q para sair do jogo");
   for (i=0;i<51;i++) {
     move(i,0);
     echochar('|');
