@@ -902,7 +902,10 @@ void Servidor::initServer() {
 
   (this->myself).sin_family = AF_INET;
   (this->myself).sin_port = htons(3001);
-  inet_aton("192.168.0.49", &((this->myself).sin_addr));
+  char ip[16];
+  printf("Insira o seu ip:");
+  scanf("%s", ip);
+  inet_aton(ip, &((this->myself).sin_addr));
 
 
   if (bind(this->socket_fd, (struct sockaddr*)&(this->myself), sizeof(this->myself)) != 0) {

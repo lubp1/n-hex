@@ -668,7 +668,10 @@ int Cliente::initClient() {
    
   target.sin_family = AF_INET;
   target.sin_port = htons(3001);
-  inet_aton("192.168.0.49", &(target.sin_addr));
+  char ip[16];
+  printf("Insira o ip do servidor:");
+  scanf("%s", ip);
+  inet_aton(ip, &(target.sin_addr));
   if(connect(this->socket_fd, (struct sockaddr*)&target, sizeof(target))) {
     return 1;
   }
