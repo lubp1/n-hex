@@ -14,7 +14,6 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include "../headers/json.hpp"
-#include<numeric>
 
 #define  MAX_Y 200
 #define  MIN_Y 2
