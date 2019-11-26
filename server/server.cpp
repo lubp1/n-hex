@@ -98,22 +98,21 @@ int main (){
     for(int i = 0; i < MAX_PLAYERS; i++) {
       acumulador += servidor->getJogadorVivo(i);
     }
-    if (acumulador == 2*servidor->getJogadores() && servidor->getJogadores() > 0) {
-      for(int i = 0; i < MAX_PLAYERS; i++) {
-        if(servidor->getJogadorVivo(i)) {
-          // Colorindo jogadores e marcando como vivos
-          servidor->setJogadorVivo(1, i);
-          l->get_corpos()->at(i)->set_cor(i+1);
-          l->get_corpos()->at(i)->set_jogador(1);
-          l->get_corpos()->at(i)->set_orb(i+1);
-          l->get_corpos()->at(i)->set_rot('a');
-        }
-      } 
+    if (acumulador == 2*servidor->getJogadores() && servidor->getJogadores() > 0) { 
       break;
     }
   }
   (servidor->wait_thread).join();
-
+  for(int i = 0; i < MAX_PLAYERS; i++) {
+    if(servidor->getJogadorVivo(i)) {
+      // Colorindo jogadores e marcando como vivos
+      servidor->setJogadorVivo(1, i);
+      l->get_corpos()->at(i)->set_cor(i+1);
+      l->get_corpos()->at(i)->set_jogador(1);
+      l->get_corpos()->at(i)->set_orb(i+1);
+      l->get_corpos()->at(i)->set_rot('a');
+    }
+  }
 
   // Thread que envia o model para os usuarios
   std::thread newthread3(threadEnviaCorpos, servidor, l);
