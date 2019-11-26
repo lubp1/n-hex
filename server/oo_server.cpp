@@ -840,23 +840,30 @@ void threadServidor(Servidor* server, int id) {
 // Thread que espera novas conexoes
 void threadEsperaServidor(Servidor* server) {
   int conn_fd;
-  char reply;
-  while(server->getRodando()) {
+  while(server->getJogadores() < MAX_PLAYERS) {
     conn_fd = accept(server->getSocket(), (struct sockaddr*)&server->client, &server->client_size);
     if (conn_fd != -1) {
       for(int i = 0; i < MAX_PLAYERS; i++) {
         if(!server->getConexaoUsada(i)) {
           printf("Adicionando cliente %d.\n", i);
-          reply = i;
           server->setConnection(conn_fd,i);
           server->setConexaoUsada(1,i);
           server->novoJogador();
+          printf("%d jogadores\n", server->getJogadores());
           break;
         }
       }
     }
+    int acumulador = 0;
+    for(int i = 0; i < MAX_PLAYERS; i++) {
+      acumulador += server->getJogadorVivo(i);
+    }
+    if (acumulador == 2*server->getJogadores() && server->getJogadores() > 0) {
+      printf("Todos os jogadores prontos, iniciando o jogo.\n");
+      return;
+    }
   }
-  printf("Saindo da thread de esperar conexoes.\n");
+  printf("Quantidade máxima de jogadores, iniciando jogo.\n");
   return;
 }
 
@@ -927,7 +934,6 @@ void Servidor::endServer() {
   for(int i = 0; i < MAX_PLAYERS; i++) {
     (this->kb_thread[i]).join();
   }
-  (this->wait_thread).join();
   (this->model_thread).join();
 
   for (int i=0; i<MAX_PLAYERS; i++) {
@@ -955,6 +961,12 @@ char Servidor::getBuffer(int pos) {
   char c = this->input_buffer[pos];
   this->input_buffer[pos] = 0;
   return c;
+}
+void Servidor::setJogadorVivo(int vivo, int pos) {
+  this->jogador_vivo[pos] = vivo;
+}
+int Servidor::getJogadorVivo(int pos) {
+  return this->jogador_vivo[pos];
 }
 void Servidor::setRodando(int rodando) {
   this->rodando = rodando;

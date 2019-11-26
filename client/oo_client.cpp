@@ -644,7 +644,7 @@ void threadCorpos(Cliente* client, ListaDeCorpos* l) {
 void threadEnviaComandos(Cliente* client, Teclado* teclado) {
   while(client->getRodando()) {
     char c = teclado->getchar();
-    if(c == ' ' || c == 'q'){
+    if(c == ' ' || c == 'q' || c == 's'){
       if((send(client->getSocket(), &c, 1, 0) == -1) || c == 'q') {
         printw("Pressione qualquer tecla para sair");
         client->setRodando(0);

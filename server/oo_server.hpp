@@ -147,7 +147,7 @@ class Servidor {
     char* input_buffer;
     int rodando;
     int jogadores;
-    int jogador_vivo[MAX_PLAYERS]; // 0 = jogador nao logado, 1 = jogador vivo, -1 = jogador morto
+    int jogador_vivo[MAX_PLAYERS]; // 0 = jogador nao logado, 1 = jogador vivo, -1 = jogador morto, 2 = jogador pronto para jogar
 
 
   public:
@@ -160,6 +160,8 @@ class Servidor {
     void endServer();
     void setBuffer(char buffer, int pos);
     char getBuffer(int pos);
+    void setJogadorVivo(int vivo, int pos);
+    int getJogadorVivo(int pos);
     void setRodando(int rodando);
     int  getRodando();
     void setConnection(int connection, int pos);

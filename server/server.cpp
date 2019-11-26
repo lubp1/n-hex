@@ -93,6 +93,27 @@ int main (){
   int ganhou = 0;
 
 
+
+  while(1) {
+    for (int i = 0; i < servidor->getJogadores(); i++) {
+      char c = servidor->getBuffer(i);
+      if (c=='s') {
+        servidor->setJogadorVivo(2,i);
+        printf("ola\n");
+      }
+    }
+    int acumulador = 0;
+    for(int i = 0; i < MAX_PLAYERS; i++) {
+      acumulador += servidor->getJogadorVivo(i);
+    }
+    if (acumulador == 2*servidor->getJogadores() && servidor->getJogadores() > 0) {
+      break;
+    }
+    std::this_thread::sleep_for (std::chrono::milliseconds(10));
+  }
+  (servidor->wait_thread).join();
+
+
   while (1) {
     // Colorindo os jogadores
     for(int i = 0; i<servidor->getJogadores(); i++) {
