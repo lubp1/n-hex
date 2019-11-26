@@ -104,18 +104,19 @@ int main() {
     }
 
 
-    std::this_thread::sleep_for (std::chrono::milliseconds(100));
+    std::this_thread::sleep_for (std::chrono::milliseconds(80));
   }
 
   cliente->endClient();
   teclado->stop();
   tela->stop();
 
+
   if(ganhou) {
-    printf("Você ganhou o jogo em %lu segundos\n", (get_now_ms()-T)/1000);
+    printf("Ganhou\n");
   }
   else if(!tela_pequena) {
-    printf("Derrota! Sobreviveu por %lu segundos\n", (get_now_ms()-T)/1000);
+    printf("Perdeu!\n");
   }
 
 

@@ -84,10 +84,10 @@ void Corpo::set_jogador(int jogador){
 // Funcao para serializar um corpo
 std::string Corpo::serialize(){
   json j;
-  j["velY"] = this->velY;
-  j["velX"] = this->velX;
-  j["posY"] = this->posY;
-  j["posX"] = this->posX;
+  j["velY"] = (int) this->velY;
+  j["velX"] = (int) this->velX;
+  j["posY"] = (int) this->posY;
+  j["posX"] = (int) this->posX;
   j["orb"] = this->orb;
   j["rot"] = this->rot;
   j["pos_orb"] = this->pos_orb;
