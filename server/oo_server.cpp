@@ -522,7 +522,7 @@ int Fisica::update(float deltaT, int tamTela) {
               if(!(*c)[j]->get_cor()) { // Se for um corpo neutro
                 (*c)[j]->set_cor((*c)[i]->get_cor());
               }
-              else if ((*c)[j]->get_cor() != (*c)[i]->get_cor()) { // Se colidiu com uma bola inimiga
+              else if ((*c)[j]->get_cor() != (*c)[i]->get_cor() && !(*c)[j]->get_jogador()) { // Se colidiu com uma bola inimiga
                 return i + 1;
               }
             }
@@ -530,7 +530,7 @@ int Fisica::update(float deltaT, int tamTela) {
               if(!(*c)[i]->get_cor()) { // Se for um corpo neutro
                 (*c)[i]->set_cor((*c)[j]->get_cor());
               }
-              else if ((*c)[i]->get_cor() != (*c)[j]->get_cor()) { // Se colidiu com uma bola inimiga
+              else if ((*c)[i]->get_cor() != (*c)[j]->get_cor() && !(*c)[i]->get_jogador()) { // Se colidiu com uma bola inimiga
                 return j + 1;
               }
             }
@@ -942,6 +942,8 @@ void Servidor::endServer() {
       close(this->connection_fd[i]);
     }
   }
+
+  free(this->input_buffer);
 }
 
 

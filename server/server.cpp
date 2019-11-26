@@ -30,9 +30,7 @@ int main (){
     Corpo *c15 = new Corpo(-10, -10, rand()%45, rand()%190);
   */
 
-  // O jogador comeca orbitando
-  c1->set_orb(4);
-  c1->set_rot('a');
+  
 
   
 
@@ -74,9 +72,6 @@ int main (){
   // Thread que espera a conexão de usuarios
   std::thread newthread2(threadEsperaServidor, servidor);
   (servidor->wait_thread).swap(newthread2);
-  // Thread que envia o model para os usuarios
-  std::thread newthread3(threadEnviaCorpos, servidor, l);
-  (servidor->model_thread).swap(newthread3);
 
 
   uint64_t t0;
@@ -110,12 +105,19 @@ int main (){
           servidor->setJogadorVivo(1, i);
           l->get_corpos()->at(i)->set_cor(i+1);
           l->get_corpos()->at(i)->set_jogador(1);
+          l->get_corpos()->at(i)->set_orb(i+1);
+          l->get_corpos()->at(i)->set_rot('a');
         }
       } 
       break;
     }
   }
   (servidor->wait_thread).join();
+
+
+  // Thread que envia o model para os usuarios
+  std::thread newthread3(threadEnviaCorpos, servidor, l);
+  (servidor->model_thread).swap(newthread3);
 
   T = get_now_ms();
   t1 = T;
