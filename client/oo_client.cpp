@@ -589,6 +589,7 @@ void threadCorpos(Cliente* client, ListaDeCorpos* l) {
   char reply[100000];
   int msg_len;
   while(client->getRodando() == 1) {
+    std::this_thread::sleep_for (std::chrono::milliseconds(5));
     msg_len = recv(client->getSocket(), reply, 100000, MSG_DONTWAIT);
     if (msg_len > 10) {
       std::string data(reply);
@@ -601,7 +602,6 @@ void threadCorpos(Cliente* client, ListaDeCorpos* l) {
         client->setRodando(0);
       }
     }
-    std::this_thread::sleep_for (std::chrono::milliseconds(5));
   }
 }
 
