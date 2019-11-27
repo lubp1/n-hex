@@ -608,7 +608,7 @@ void threadCorpos(Cliente* client, ListaDeCorpos* l) {
 void threadEnviaComandos(Cliente* client) {
   while(client->getRodando()) {
     char c = getch();
-    if(c == ' ' || c == 'q' || c == 's'){
+    if(c == ' ' || c == 'q' || c == 's' || c == 'k'|| c == 'j'){
       if((send(client->getSocket(), &c, 1, 0) == -1) || c == 'q') {
         printw("Pressione qualquer tecla para sair");
         send(client->getSocket(), 0, 1, 0);
@@ -618,7 +618,7 @@ void threadEnviaComandos(Cliente* client) {
         send(client->getSocket(), 0, 1, 0);
       }
     }
-    std::this_thread::sleep_for (std::chrono::milliseconds(10));
+    std::this_thread::sleep_for (std::chrono::milliseconds(20));
   }
   
 }

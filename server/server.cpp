@@ -23,16 +23,12 @@ int main (){
   Corpo *c9 = new Corpo(10, 10, rand()%45, rand()%190);
   Corpo *c10 = new Corpo(10, 10, rand()%45, rand()%190);
   /*
-  Corpo *c11 = new Corpo(10, 10, rand()%45, rand()%190);
-  Corpo *c12 = new Corpo(-10, 10, rand()%45, rand()%190);
-  Corpo *c13 = new Corpo(10, -10, rand()%45, rand()%190);
-  Corpo *c14 = new Corpo(-10, 10, rand()%45, rand()%190);
-  Corpo *c15 = new Corpo(-10, -10, rand()%45, rand()%190);
-  */
-
-  
-
-  
+    Corpo *c11 = new Corpo(10, 10, rand()%45, rand()%190);
+    Corpo *c12 = new Corpo(-10, 10, rand()%45, rand()%190);
+    Corpo *c13 = new Corpo(10, -10, rand()%45, rand()%190);
+    Corpo *c14 = new Corpo(-10, 10, rand()%45, rand()%190);
+    Corpo *c15 = new Corpo(-10, -10, rand()%45, rand()%190);
+  */  
 
   ListaDeCorpos *l = new ListaDeCorpos();
 
@@ -57,11 +53,6 @@ int main (){
 
   Fisica *f = new Fisica(l, mapa);
 
-  /*
-  Tela *tela = new Tela(l, 20, 20, 20, 20, mapa);
-  tela->init();
-  */
-
   Servidor *servidor = new Servidor();
   servidor->initServer();
   // Thread que espera a conexão de usuarios
@@ -73,7 +64,6 @@ int main (){
     (servidor->kb_thread[i]).swap(newthread);
   }
 
-
   uint64_t t0;
   uint64_t t1;
   uint64_t deltaT;
@@ -81,7 +71,6 @@ int main (){
   uint64_t ts0, ts1;
 
   int i = 0;
-
 
   // Esperando todos os jogadores conectarem ou todos os conectados estarem prontos
   while(1) {
@@ -119,15 +108,14 @@ int main (){
   T = get_now_ms();
   t1 = T;
 
+  int frameTest = 87;
 
   while (1) {
-
 
     // Atualiza timers
     t0 = t1;
     t1 = get_now_ms();
     deltaT = t1-t0;
-
 
 
     // Atualiza modelo
@@ -137,17 +125,19 @@ int main (){
       servidor->setJogadorVivo(-1,jogador_morto);
     }
 
-    /*
-    // Atualiza tela
-    tela_pequena = tela->update();
-    */
-
-
     // Lê o teclado
     for (int i = 0; i < servidor->getJogadores(); i++) {
       char c = servidor->getBuffer(i);
       if (c==' ') {
         f->impulso(i);
+      }
+      if (c == 'k'){
+        frameTest++;
+        printf("\n%d", frameTest);
+      }
+      if (c == 'j'){
+        frameTest--;
+        printf("\n%d", frameTest);
       }
     }
 
@@ -157,7 +147,7 @@ int main (){
       break;
     }
 
-    std::this_thread::sleep_for (std::chrono::milliseconds(100));
+    std::this_thread::sleep_for (std::chrono::milliseconds(frameTest));
     i++;
   }
 fim:

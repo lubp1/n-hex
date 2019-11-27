@@ -423,10 +423,10 @@ int Fisica::update(float deltaT, int tamTela) {
     else if((*c)[i]->get_orb() == 1){
       // Avanca uma posicao no hexagono
       if((*c)[i]->get_rot() == 'h'){
-        (*c)[i]->set_pos_orb( ((*c)[i]->get_pos_orb() + 1)%2);
+        (*c)[i]->set_pos_orb( (int)((*c)[i]->get_pos_orb() + 1)%2);
       }
       else if((*c)[i]->get_rot() == 'a'){
-        (*c)[i]->set_pos_orb( (*c)[i]->get_pos_orb() - 1);
+        (*c)[i]->set_pos_orb( ((int)(*c)[i]->get_pos_orb() - 1)%2);
         if ((*c)[i]->get_pos_orb() == -1) {
           (*c)[i]->set_pos_orb(1);
         }
@@ -441,10 +441,10 @@ int Fisica::update(float deltaT, int tamTela) {
     else if((*c)[i]->get_orb() == 2){
       // Avanca uma posicao no hexagono
       if((*c)[i]->get_rot() == 'h'){
-        (*c)[i]->set_pos_orb( ((*c)[i]->get_pos_orb() + 1)%8);
+        (*c)[i]->set_pos_orb((int) ((*c)[i]->get_pos_orb() + 1)%8);
       }
       else if((*c)[i]->get_rot() == 'a'){
-        (*c)[i]->set_pos_orb( ((*c)[i]->get_pos_orb() - 1)%8);
+        (*c)[i]->set_pos_orb((int) ((*c)[i]->get_pos_orb() - 1)%8);
         if ((*c)[i]->get_pos_orb() == -1) {
           (*c)[i]->set_pos_orb(7);
         }
@@ -459,10 +459,10 @@ int Fisica::update(float deltaT, int tamTela) {
     else if((*c)[i]->get_orb() == 3){
       // Avanca uma posicao no hexagono
       if((*c)[i]->get_rot() == 'h'){
-        (*c)[i]->set_pos_orb( ((*c)[i]->get_pos_orb() + 1)%12);
+        (*c)[i]->set_pos_orb((int) ((*c)[i]->get_pos_orb() + 1)%12);
       }
       else if((*c)[i]->get_rot() == 'a'){
-        (*c)[i]->set_pos_orb( ((*c)[i]->get_pos_orb() - 1)%12);
+        (*c)[i]->set_pos_orb((int) ((*c)[i]->get_pos_orb() - 1)%12);
         if ((*c)[i]->get_pos_orb() == -1) {
           (*c)[i]->set_pos_orb(11);
         }
@@ -477,10 +477,10 @@ int Fisica::update(float deltaT, int tamTela) {
     else if((*c)[i]->get_orb() == 4){
       // Avanca uma posicao no hexagono
       if((*c)[i]->get_rot() == 'h'){
-        (*c)[i]->set_pos_orb( ((*c)[i]->get_pos_orb() + 1)%18);
+        (*c)[i]->set_pos_orb((int) ((*c)[i]->get_pos_orb() + 1)%18);
       }
       else if((*c)[i]->get_rot() == 'a'){
-        (*c)[i]->set_pos_orb( ((*c)[i]->get_pos_orb() - 1)%18);
+        (*c)[i]->set_pos_orb((int) ((*c)[i]->get_pos_orb() - 1)%18);
         if ((*c)[i]->get_pos_orb() == -1) {
           (*c)[i]->set_pos_orb(17);
         }
