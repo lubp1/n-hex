@@ -586,10 +586,10 @@ Tela::~Tela() {
 
 // Funcao que roda em uma outra thread para receber os dados do servidor
 void threadCorpos(Cliente* client, ListaDeCorpos* l) {
-  char reply[10000];
+  char reply[100000];
   int msg_len;
   while(client->getRodando() == 1) {
-    msg_len = recv(client->getSocket(), reply, 10000, MSG_DONTWAIT);
+    msg_len = recv(client->getSocket(), reply, 100000, MSG_DONTWAIT);
     if (msg_len > 10) {
       std::string data(reply);
       if (data.length() > 1) {
