@@ -601,6 +601,7 @@ void threadCorpos(Cliente* client, ListaDeCorpos* l) {
         client->setRodando(0);
       }
     }
+    std::this_thread::sleep_for (std::chrono::milliseconds(5));
   }
 }
 
