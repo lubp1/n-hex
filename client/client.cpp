@@ -28,13 +28,6 @@ int main() {
   Corpo *c8 = new Corpo(0, 0, 0, 0);
   Corpo *c9 = new Corpo(0, 0, 0, 0);
   Corpo *c10 = new Corpo(0, 0, 0, 0);
-  /*
-  Corpo *c11 = new Corpo(0, 0, 0, 0);
-  Corpo *c12 = new Corpo(0, 0, 0, 0);
-  Corpo *c13 = new Corpo(0, 0, 0, 0);
-  Corpo *c14 = new Corpo(0, 0, 0, 0);
-  Corpo *c15 = new Corpo(0, 0, 0, 0);
-  */
 
   ListaDeCorpos *l = new ListaDeCorpos();
 
@@ -48,13 +41,6 @@ int main() {
   l->add_corpo(c8);
   l->add_corpo(c9);
   l->add_corpo(c10);
-  /*
-  l->add_corpo(c11);
-  l->add_corpo(c12);
-  l->add_corpo(c13);
-  l->add_corpo(c14);
-  l->add_corpo(c15);
-  */
 
   Cliente *cliente = new Cliente();
   if (cliente->initClient()) {
@@ -66,11 +52,6 @@ int main() {
 
   Tela *tela = new Tela(l, 20, 20, 20, 20, mapa);
   tela->init();
-
-  /*
-  Teclado *teclado = new Teclado();
-  teclado->init();
-  */
 
   uint64_t t0;
   uint64_t t1;
@@ -102,7 +83,6 @@ int main() {
   }
 
 
-  //teclado->stop();
   tela->stop();
 
   if(cliente->getGanhou() == 'g') {

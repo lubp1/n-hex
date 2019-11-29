@@ -96,7 +96,7 @@ std::string Corpo::serialize(){
 
   return j.dump();
 }
-
+// Funcao para desserializar um corpo e copiar seus atributos
 void Corpo::unserialize(std::string corpo_serializado){
   json j;
   j = json::parse(corpo_serializado);
@@ -627,198 +627,6 @@ void Fisica::impulso(int id) {
   (*c)[id]->set_rot(rotacao);
 }
 
-// Classe Tela
-
-Tela::Tela(ListaDeCorpos *ldc, int maxI, int maxJ, float maxX, float maxY, Mapa* mapa) {
-  this->lista = ldc;
-  this->lista_anterior = new ListaDeCorpos();
-  this->lista_anterior->copy(this->lista);
-  this->maxI = maxI;
-  this->maxJ = maxJ;
-  this->maxX = maxX;
-  this->maxY = maxY;
-  this->mapa = mapa;
-}
-
-// Criando a tela, escolhendo cores e criando o mapa inicial
-void Tela::init() {
-  initscr();			       /* Start curses mode 		*/
-	raw();				         /* Line buffering disabled	*/
-  curs_set(0);           /* Do not display cursor */
-
-  // Escolhendo indice das cores dos corpos
-  start_color();
-  init_pair(0, COLOR_WHITE, COLOR_BLACK);
-  init_pair(1, COLOR_WHITE, COLOR_BLUE);
-  init_pair(2, COLOR_WHITE, COLOR_RED);
-  init_pair(3, COLOR_WHITE, COLOR_YELLOW);
-  init_pair(4, COLOR_WHITE, COLOR_CYAN);
-  init_pair(5, COLOR_WHITE, COLOR_MAGENTA);
-
-  // Tamanho do mapa
-  this->row = 50;
-  this->col = 200;
-
-  // Limpando a tela
-  erase();
-
-  // Imprimindo bordas
-  int i;
-  for (i=0;i<201;i++) {
-    move(0,i);
-    echochar('-');
-    move(50,  i);
-    echochar('-');
-  }
-  for (i=0;i<51;i++) {
-    move(i,0);
-    echochar('|');
-    move(i,201);
-    echochar('|');
-  }
-
-  // Imprimindo os hexagonos
-  int* hexX = this->mapa->get_listaX();
-  int* hexY = this->mapa->get_listaY();
-  for (i=0;i<8; i++) {
-
-    //Centro do hexagono
-    move(hexX[i],hexY[i]);
-    echochar('.');
-
-    // Lados inclinados
-    int j;
-    for (j=0;j<4;j++) {
-      move(hexX[i]-j,hexY[i]-8+j);
-      echochar('/');
-      move(hexX[i]-j,hexY[i]+8-j);
-      echochar('\\');
-      move(hexX[i]+1+j,hexY[i]-8+j);
-      echochar('\\');
-      move(hexX[i]+1+j,hexY[i]+8-j);
-      echochar('/');
-    }
-
-    // Lados retos
-    for(j=0;j<9;j++) {
-      move(hexX[i]-4,hexY[i]-4+j);
-      echochar('_');
-      move(hexX[i]+4,hexY[i]-4+j);
-      echochar('_');
-    }
-  }
-
-}
-
-int Tela::getRows(){
-  return this->row;
-}
-
-int Tela::getCols(){
-  return this->col;
-}
-
-// Funcao que atualiza a tela a cada iteracao, retorna 1 se a tela eh menor do que o necessario e 0 caso contrario
-int Tela::update() {
-
-  int x_pos, y_pos;
-  getmaxyx(stdscr, this->row, this->col);
-
-  // Se a tela eh pequena demais
-  if(this->row < MAX_X || this->col < MAX_Y){
-    erase();
-    move(row/2, col/2);
-    printw("Aumente a tela e reinicie o jogo, aperte 'q' para sair");
-    std::this_thread::sleep_for (std::chrono::seconds(1));
-    return 1;
-  }
-
-  std::vector<Corpo *> *corpos_old = this->lista_anterior->get_corpos();
-
-  //Apaga corpos na tela
-  for (int k=0; k<corpos_old->size(); k++){
-
-    x_pos = (int) ((*corpos_old)[k]->get_posX());
-    y_pos = (int) ((*corpos_old)[k]->get_posY());
-
-
-    move(x_pos, y_pos);   /* Move cursor to position */
-    echochar(' ');  /* Prints character, advances a position */
-
-    // Reimprimindo o hexagono mais proximo, para caso ele tenha sido apagado
-    int hex = this->mapa->buscaHex(x_pos, y_pos);
-    int* hexX = this->mapa->get_listaX();
-    int* hexY = this->mapa->get_listaY();
-
-    if (abs(hexX[hex]-x_pos) < 9 && abs(hexY[hex]-y_pos) < 9) {
-      //Centro do hexagono
-      move(hexX[hex],hexY[hex]);
-      echochar('.');
-
-      // Lados inclinados
-      int j;
-      for (j=0;j<4;j++) {
-        move(hexX[hex]-j,hexY[hex]-8+j);
-        echochar('/');
-        move(hexX[hex]-j,hexY[hex]+8-j);
-        echochar('\\');
-        move(hexX[hex]+1+j,hexY[hex]-8+j);
-        echochar('\\');
-        move(hexX[hex]+1+j,hexY[hex]+8-j);
-        echochar('/');
-      }
-
-      // Lados retos
-      for(j=0;j<9;j++) {
-        move(hexX[hex]-4,hexY[hex]-4+j);
-        echochar('_');
-        move(hexX[hex]+4,hexY[hex]-4+j);
-        echochar('_');
-      }
-    }
-  }
-
-  // Desenha corpos na tela
-  std::vector<Corpo *> *corpos = this->lista->get_corpos();
-
-  for (int k=0; k<corpos->size(); k++) {
-
-    x_pos = (int) ((*corpos)[k]->get_posX());
-    y_pos = (int) ((*corpos)[k]->get_posY());
-
-    if ((*corpos)[k]->get_jogador()) { // Jogador
-      move(x_pos, y_pos);
-      attron(COLOR_PAIR((*corpos)[k]->get_cor()));
-      echochar('*');
-      attroff(COLOR_PAIR((*corpos)[k]->get_cor()));
-    } else { // Outros corpos
-      move(x_pos, y_pos);
-      attron(COLOR_PAIR((*corpos)[k]->get_cor()));
-      echochar('o');
-      attroff(COLOR_PAIR((*corpos)[k]->get_cor()));
-    }
-
-    // Atualiza corpos antigos
-    if (corpos->size() == corpos_old->size()) { // Se nao tem corpos novos
-      (*corpos_old)[k]->update((*corpos)[k]->get_velX(), (*corpos)[k]->get_velY(), (*corpos)[k]->get_posX(), (*corpos)[k]->get_posY());
-    } else { // Se tem corpos novos
-      this->lista_anterior->copy(this->lista);
-    }
-  }
-
-  // Atualiza tela
-  refresh();
-  return 0;
-}
-
-void Tela::stop() {
-  endwin();
-}
-
-Tela::~Tela() {
-  this->stop();;
-}
-
 
 // Funcao que roda em uma segunda thread para ouvir cada cliente
 void threadServidor(Servidor* server, int id) {
@@ -910,6 +718,7 @@ void threadEnviaCorpos(Servidor* server, ListaDeCorpos* l) {
   return;
 }
 
+// Classe Servidor
 
 Servidor::Servidor() {
   this->jogadores = 0;

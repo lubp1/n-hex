@@ -117,27 +117,7 @@ class Fisica {
     int update(float deltaT, int tamTela);
 };
 
-// Classe que imprime o mapa e corpos na tela
-class Tela {
-  private:
-    ListaDeCorpos *lista, *lista_anterior;
-    int maxI, maxJ;
-    float maxX, maxY;
-    int row, col;
-    Mapa* mapa;
-
-
-  public:
-    Tela(ListaDeCorpos *ldc, int maxI, int maxJ, float maxX, float maxY, Mapa* mapa);
-    ~Tela();
-    void stop();
-    void init();
-    int update();
-    int getRows(void);
-    int getCols(void);
-};
-
-
+// Classe que cuida da conexao com os clientes
 class Servidor {
   private:
     int socket_fd;

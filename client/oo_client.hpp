@@ -20,26 +20,6 @@
 #include "../headers/json.hpp"
 
 
-// Funcao que roda em outra thread para ler o teclado
-void threadTeclado (char *keybuffer, int *control);
-
-// Classe que le do teclado
-class Teclado {
-  private:
-    char ultima_captura;
-    int rodando;
-
-    std::thread kb_thread;
-
-  public:
-    Teclado();
-    ~Teclado();
-    void stop();
-    void init();
-    char getchar();
-};
-
-
 // Classe de corpos. Cada corpo possui sua velocidade e posicao nos eixos X e Y, alem de atributos de sua rotacao e cor
 class Corpo {
   private:
@@ -148,7 +128,7 @@ class Tela {
     int getCols(void);
 };
 
-
+// Classe que cuida da conexao com o servidor
 class Cliente {
     private:
     int socket_fd;

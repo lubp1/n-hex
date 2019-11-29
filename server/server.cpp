@@ -12,6 +12,7 @@ int main (){
 
   Mapa* mapa = new Mapa();
 
+  // Criando corpos
   Corpo *c1 = new Corpo(0, -10, 15, 100); //nave
   Corpo *c2 = new Corpo(10, -10, rand()%45, rand()%190);
   Corpo *c3 = new Corpo(10, 10, rand()%45, rand()%190);
@@ -21,14 +22,7 @@ int main (){
   Corpo *c7 = new Corpo(10, 10, rand()%45, rand()%190);
   Corpo *c8 = new Corpo(10, 10, rand()%45, rand()%190);
   Corpo *c9 = new Corpo(10, 10, rand()%45, rand()%190);
-  Corpo *c10 = new Corpo(10, 10, rand()%45, rand()%190);
-  /*
-    Corpo *c11 = new Corpo(10, 10, rand()%45, rand()%190);
-    Corpo *c12 = new Corpo(-10, 10, rand()%45, rand()%190);
-    Corpo *c13 = new Corpo(10, -10, rand()%45, rand()%190);
-    Corpo *c14 = new Corpo(-10, 10, rand()%45, rand()%190);
-    Corpo *c15 = new Corpo(-10, -10, rand()%45, rand()%190);
-  */  
+  Corpo *c10 = new Corpo(10, 10, rand()%45, rand()%190); 
 
   ListaDeCorpos *l = new ListaDeCorpos();
 
@@ -42,13 +36,6 @@ int main (){
   l->add_corpo(c8);
   l->add_corpo(c9);
   l->add_corpo(c10);
-  /*
-    l->add_corpo(c11);
-    l->add_corpo(c12);
-    l->add_corpo(c13);
-    l->add_corpo(c14);
-    l->add_corpo(c15);
-  */
 
 
   Fisica *f = new Fisica(l, mapa);
@@ -150,9 +137,7 @@ int main (){
     std::this_thread::sleep_for (std::chrono::milliseconds(frameTest));
     i++;
   }
-fim:
   servidor->endServer();
-  //tela->stop();
   printf("Servidor fechado.\n");
   return 0;
 }
